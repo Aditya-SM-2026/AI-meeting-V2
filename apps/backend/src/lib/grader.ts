@@ -1,6 +1,6 @@
 import { callGeminiJson } from './gemini.js';
 import type { InterviewPlan } from './plan.js';
-import type { VideoFactor } from './video.js';
+import type { VideoFactorResult } from './videoAnalysis.js';
 
 const GRADER_MODEL = 'gemini-3.1-flash-lite';
 
@@ -56,7 +56,7 @@ export interface Scorecard {
         answers: { score: number | null; note: string };
         resumeMatch: { score: number | null; note: string; claims: ResumeClaim[] };
         authenticity: { score: number | null; signals: AuthSignal[] };
-        video: VideoFactor;
+        video: VideoFactorResult;
     };
     integritySignals: {
         tabHiddenCount: number;
@@ -234,7 +234,7 @@ export async function buildScorecard(input: {
     jobDescription: string;
     sessionEvents: any;
     sessionMetrics: any;
-    videoFactor: VideoFactor;
+    videoFactor: VideoFactorResult;
     interviewDurationSec: number;
 }): Promise<Scorecard> {
     const { turns, plan, resumeText, jobDescription, sessionEvents, sessionMetrics, videoFactor } = input;

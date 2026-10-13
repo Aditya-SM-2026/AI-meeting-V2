@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import crypto from 'crypto';
 import prisma from '../lib/prisma.js';
 import { generatePlan } from '../lib/plan.js';
 import { extractResumeText } from '../lib/resume.js';
@@ -10,6 +11,7 @@ const CreateInterviewSchema = z.object({
     candidateName: z.string().min(1),
     candidateEmail: z.string().email().optional().or(z.literal('')),
     recruiterName: z.string().optional().or(z.literal('')),
+    jobRole: z.string().optional().or(z.literal('')),
     jobDescription: z.string().min(1),
     resumeFileName: z.string().optional(),
     resumeBase64: z.string().optional(),
@@ -41,9 +43,11 @@ router.post("/", async (req, res) => {
             where: { jobDescription: data.jobDescription.trim() },
             orderBy: { startedAt: 'desc' },
         });
-        const plan: any = existingSameJd?.plan
-            ? existingSameJd.plan
-            : await generatePlan(resumeText, data.jobDescription.trim());
+        const plan: any = existingSameJd?.plan && data.jobRole?.trim()
+            ? { ...existingSameJd.plan, roleTitle: data.jobRole.trim().slice(0, 80) }
+            : existingSameJd?.plan
+                ? existingSameJd.plan
+                : await generatePlan(resumeText, data.jobDescription.trim(), data.jobRole?.trim() || null);
 
         const interview = await prisma.interview.create({
             data: {
@@ -131,12 +135,17 @@ router.get("/room/:token", async (req, res) => {
             res.status(409).json({ message: "This interview has already been completed" });
             return;
         }
+        const recordingToken = interview.recordingToken || (crypto.randomUUID());
+        if (!interview.recordingToken) {
+            await prisma.interview.update({ where: { id: interview.id }, data: { recordingToken } });
+        }
         res.status(200).json({
             interviewId: interview.id,
             candidateName: interview.candidateName,
             recruiterName: interview.recruiterName,
             roleTitle: (interview.plan as any)?.roleTitle || null,
             plannedDurationSec: interview.plannedDurationSec || 300,
+            recordingToken,
         });
     } catch (err: any) {
         console.error("Room lookup error:", err?.message);
@@ -178,14 +187,12 @@ router.put("/:id/decision", async (req, res) => {
     }
 });
 
-const RecordingSchema = z.object({
-    recordingBase64: z.string().min(16),
-    recordingStartedAt: z.string().optional(),
-});
+const EmailSchema = z.object({ email: z.string().email() });
 
-router.post("/:id/recording", async (req, res) => {
+/** Candidate typed their email on the join screen. */
+router.put("/:id/email", async (req, res) => {
     try {
-        const { success, data } = RecordingSchema.safeParse(req.body);
+        const { success, data } = EmailSchema.safeParse(req.body);
         if (!success) {
             res.status(400).json({ message: "Validation failed" });
             return;
@@ -197,14 +204,10 @@ router.post("/:id/recording", async (req, res) => {
         }
         await prisma.interview.update({
             where: { id: req.params.id },
-            data: {
-                recordingData: data.recordingBase64,
-                recordingStartedAt: data.recordingStartedAt ? new Date(data.recordingStartedAt) : new Date(),
-            }
+            data: { candidateEmail: data.email.trim() },
         });
-        res.status(200).json({ message: "Recording stored" });
+        res.status(200).json({ message: "Email saved" });
     } catch (err: any) {
-        console.error("Recording upload error:", err?.message);
         res.status(500).json({ message: "Internal server error" });
     }
 });

@@ -3,62 +3,62 @@ import axios from "axios";
 import { useMicStream } from "../hooks/useMicStream";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { useVideoStream } from "../hooks/useVideoStream";
-
-const INTERVIEW_SECONDS = 5 * 60;
-
-// Injects the report's two type families once per app load.
-// Move this into index.html if you'd rather not do it at runtime.
-const FONT_LINK_ID = "interview-report-fonts";
-function useReportFonts() {
-    useEffect(() => {
-        if (document.getElementById(FONT_LINK_ID)) return;
-        const link = document.createElement("link");
-        link.id = FONT_LINK_ID;
-        link.rel = "stylesheet";
-        link.href =
-            "https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap";
-        document.head.appendChild(link);
-    }, []);
-}
-
-type ConnectionStatus = "connecting" | "live" | "ended" | "error";
+import { useCandidateRecorder } from "../hooks/useCandidateRecorder";
+import { takePendingCameraStream } from "./Room";
 
 interface TranscriptLine {
     role: "User" | "Assistance";
     text: string;
 }
 
-const STATUS_COPY: Record<ConnectionStatus, { label: string; color: string }> = {
-    connecting: { label: "Connecting", color: "#8A6D1D" },
-    live: { label: "On air", color: "#2E6F52" },
-    ended: { label: "Ended", color: "#63666F" },
-    error: { label: "Connection error", color: "#9C3B2E" },
-};
+const STATUS_COPY = {
+    connecting: { label: "Connecting…", color: "#8A6D1D", bg: "#F3ECD9" },
+    live: { label: "Connected", color: "#2E6F52", bg: "#E7EFE9" },
+    reconnecting: { label: "Reconnecting…", color: "#8A6D1D", bg: "#F3ECD9" },
+    ended: { label: "Ended", color: "#63666F", bg: "#E9E9F2" },
+    error: { label: "Connection error", color: "#9C3B2E", bg: "#FBEEEA" },
+} as const;
+
+type PillKey = keyof typeof STATUS_COPY;
 
 export const Interview = ({
     interviewId,
+    recordingToken,
+    roleTitle,
+    plannedDurationSec,
+    candidateName,
     onFinished,
 }: {
     interviewId: string;
+    recordingToken: string;
+    roleTitle: string;
+    plannedDurationSec: number;
+    candidateName: string;
     onFinished?: () => void;
 }) => {
-    useReportFonts();
-    const audioRef = useRef<HTMLAudioElement>(null);
     const wsRef = useRef<WebSocket | null>(null);
-    const { playChunk, reset: resetPlayer } = useAudioPlayer();
+    const { playChunk, reset: resetPlayer, audioState, resumeAudio } = useAudioPlayer();
 
     const finishedRef = useRef(onFinished);
     useEffect(() => {
         finishedRef.current = onFinished;
     }, [onFinished]);
 
-    const [status, setStatus] = useState<ConnectionStatus>("connecting");
-    const [aiSpeaking, setAiSpeaking] = useState(false);
+    const [status, setStatus] = useState<"connecting" | "live" | "ended" | "error">("connecting");
     const [transcript, setTranscript] = useState<TranscriptLine[]>([]);
     const [elapsed, setElapsed] = useState(0);
-    const remaining = Math.max(0, INTERVIEW_SECONDS - elapsed);
     const speakingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const transcriptEndRef = useRef<HTMLDivElement>(null);
+
+    // Room controls
+    const [micOn, setMicOn] = useState(true);
+    const [camOn, setCamOn] = useState(true);
+    const [showConversation, setShowConversation] = useState(true);
+    const [soundBlocked, setSoundBlocked] = useState(false);
+    const [lastQuestion, setLastQuestion] = useState("");
+
+    // Voice state: speaking > thinking (just answered) > listening
+    const [voiceState, setVoiceState] = useState<"listening" | "speaking" | "thinking">("listening");
 
     const handleMicChunk = useCallback((base64: string) => {
         const ws = wsRef.current;
@@ -89,14 +89,74 @@ export const Interview = ({
     const videoRef = useRef(video);
     useEffect(() => {
         videoRef.current = video;
+        // Adopt the stream negotiated on the join screen (camera toggle there
+        // already decided the initial on/off state).
+        if (videoRef.current && !videoRef.current.getStream()) {
+            const pending = takePendingCameraStream();
+            if (pending) {
+                videoRef.current.adopt(pending);
+                const enabled = pending.getVideoTracks().every((t) => t.enabled);
+                setCamOn(enabled);
+            }
+        }
     }, [video]);
 
-    const videoUploadedRef = useRef(false);
     const eventsRef = useRef<any[]>([]);
     const hiddenAtRef = useRef<number | null>(null);
     const blurredAtRef = useRef<number | null>(null);
-    const recordingStartedAtRef = useRef<string | null>(null);
+    const recordingIdRef = useRef<string>(
+        typeof crypto !== "undefined" && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `rec-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+    );
+    const pushEvent = useCallback((event: Record<string, any>) => {
+        eventsRef.current.push(event);
+    }, []);
 
+    const recorder = useCandidateRecorder({
+        interviewId,
+        recordingId: recordingIdRef.current,
+        token: recordingToken,
+        apiUrl: import.meta.env.VITE_API_URL || "http://localhost:3001",
+        onEvent: pushEvent,
+    });
+    const recorderRef = useRef(recorder);
+    useEffect(() => {
+        recorderRef.current = recorder;
+    }, [recorder]);
+
+    const telemetrySentRef = useRef(false);
+    const sendTelemetry = useCallback(async () => {
+        if (telemetrySentRef.current || !interviewId) return;
+        telemetrySentRef.current = true;
+        if (eventsRef.current.length === 0) return;
+        try {
+            await axios.post(
+                `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/v1/telemetry`,
+                { interviewId, events: eventsRef.current },
+                { timeout: 30000 }
+            );
+        } catch (err) {
+            console.error("Telemetry upload failed:", err);
+        }
+    }, [interviewId]);
+
+    const finalizeSession = useCallback(async () => {
+        // Order matters: the recorder's final piece must reach the server
+        // before the page can be closed. Telemetry rides along after.
+        await recorderRef.current.stop().catch(() => {});
+        videoRef.current.stop();
+        await sendTelemetry().catch(() => {});
+    }, [sendTelemetry]);
+
+    // Consent + join markers.
+    useEffect(() => {
+        eventsRef.current.push({ type: "consent_granted", at: new Date().toISOString() });
+        eventsRef.current.push({ type: "joined", at: new Date().toISOString() });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Tab/window visibility — feeds the integrity report.
     useEffect(() => {
         const onVisibility = () => {
             if (document.hidden) {
@@ -130,50 +190,6 @@ export const Interview = ({
         };
     }, []);
 
-    const uploadVideoAnalysis = useCallback(async () => {
-        if (videoUploadedRef.current || !interviewId) return;
-        videoUploadedRef.current = true;
-        const frames = videoRef.current.getFrames();
-        if (frames.length === 0 && eventsRef.current.length === 0) return;
-        try {
-            await axios.post(
-                `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/v1/video-analysis`,
-                {
-                    interviewId,
-                    frames,
-                    events: eventsRef.current,
-                    recordingStartedAt: recordingStartedAtRef.current || undefined,
-                },
-                { timeout: 90000 }
-            );
-        } catch (err) {
-            console.error("Video analysis upload failed:", err);
-        }
-    }, [interviewId]);
-
-    const recordingUploadedRef = useRef(false);
-    const uploadRecording = useCallback(async () => {
-        if (recordingUploadedRef.current || !interviewId || !recordingStartedAtRef.current) return;
-        recordingUploadedRef.current = true;
-        try {
-            const blob = await videoRef.current.stopRecording();
-            if (!blob || blob.size === 0 || blob.size > 60 * 1024 * 1024) return;
-            const b64 = await new Promise<string>((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(String(reader.result).split(",")[1] || "");
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
-            await axios.post(
-                `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/v1/interviews/${interviewId}/recording`,
-                { recordingBase64: b64, recordingStartedAt: recordingStartedAtRef.current },
-                { timeout: 120000 }
-            );
-        } catch (err) {
-            console.error("Recording upload failed:", err);
-        }
-    }, [interviewId]);
-
     // Elapsed session timer.
     useEffect(() => {
         if (status !== "live") return;
@@ -181,10 +197,12 @@ export const Interview = ({
         return () => clearInterval(id);
     }, [status]);
 
-    // Autoscroll transcript feed.
+    // Autoscroll transcript feed (inner container only — never the page).
     useEffect(() => {
-        transcriptEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [transcript]);
+        const end = transcriptEndRef.current;
+        const box = end?.closest(".transcript-scroll") as HTMLElement | null;
+        if (end && box) box.scrollTo({ top: box.scrollHeight, behavior: "smooth" });
+    }, [transcript, showConversation]);
 
     useEffect(() => {
         if (!interviewId) {
@@ -193,7 +211,7 @@ export const Interview = ({
             return;
         }
 
-        const ws = new WebSocket(import.meta.env.VITE_WS_URL || "ws://localhost:8080");
+        const ws = new WebSocket(import.meta.env.VITE_WS_URL || "ws://localhost:8081");
         wsRef.current = ws;
 
         ws.onopen = () => {
@@ -212,9 +230,12 @@ export const Interview = ({
             switch (msg.type) {
                 case "audio":
                     playChunk(msg.payload.data);
-                    setAiSpeaking(true);
+                    setVoiceState("speaking");
                     if (speakingTimeoutRef.current) clearTimeout(speakingTimeoutRef.current);
-                    speakingTimeoutRef.current = setTimeout(() => setAiSpeaking(false), 700);
+                    speakingTimeoutRef.current = setTimeout(() => {
+                        setVoiceState((s) => (s === "speaking" ? "listening" : s));
+                    }, 700);
+                    if (audioState() === "suspended") setSoundBlocked(true);
                     break;
 
                 case "status":
@@ -222,14 +243,18 @@ export const Interview = ({
                         setStatus("live");
                         micRef.current
                             .start()
-                            .catch((err) => console.error("Error starting microphone", err));
-                        videoRef.current
-                            .start()
                             .then(() => {
-                                recordingStartedAtRef.current = new Date().toISOString();
-                                videoRef.current.startRecording();
+                                const vStream = videoRef.current.getStream();
+                                const aStream = micRef.current.getStream();
+                                if (!vStream || !aStream) return;
+                                const combined = new MediaStream([
+                                    ...vStream.getVideoTracks(),
+                                    ...aStream.getAudioTracks(),
+                                ]);
+                                const ok = recorderRef.current.start(combined);
+                                if (!ok) console.warn("Recording unsupported in this browser");
                             })
-                            .catch((err) => console.error("Error starting camera", err));
+                            .catch((err) => console.error("Error starting microphone", err));
                     } else if (msg.status === "error") {
                         setStatus("error");
                     } else if (msg.status === "disconnected") {
@@ -238,21 +263,26 @@ export const Interview = ({
                     break;
 
                 case "transcript":
-                    setTranscript((prev) => [...prev, { role: msg.role, text: msg.text }]);
+                    setTranscript((prev) => {
+                        const line: TranscriptLine = { role: msg.role, text: msg.text };
+                        const next = [...prev, line];
+                        if (line.role === "Assistance") setLastQuestion(line.text);
+                        if (line.role === "User") setVoiceState("thinking");
+                        return next;
+                    });
                     break;
 
                 case "interviewComplete":
                     setStatus("ended");
+                    setVoiceState("listening");
                     void (async () => {
-                        await uploadRecording();
-                        videoRef.current.stop();
-                        await uploadVideoAnalysis();
+                        await finalizeSession();
                         finishedRef.current?.();
                     })();
                     break;
 
                 case "interrupted":
-                    setAiSpeaking(false);
+                    setVoiceState((s) => (s === "speaking" ? "listening" : s));
                     break;
 
                 default:
@@ -269,11 +299,7 @@ export const Interview = ({
             console.log("WebSocket Closed", event.code, event.reason);
             eventsRef.current.push({ type: "disconnect", at: new Date().toISOString() });
             micRef.current.stop();
-            void (async () => {
-                await uploadRecording();
-                videoRef.current.stop();
-                await uploadVideoAnalysis();
-            })();
+            void finalizeSession();
             wsRef.current = null;
             setStatus((s) => (s === "ended" ? s : "ended"));
         };
@@ -293,257 +319,360 @@ export const Interview = ({
             micRef.current.stop();
             resetPlayer();
             wsRef.current?.close();
-            await uploadRecording();
-            videoRef.current.stop();
-            await uploadVideoAnalysis();
+            await finalizeSession();
             finishedRef.current?.();
         })();
     };
 
-    const statusMeta = STATUS_COPY[status];
+    const leaveInterview = () => {
+        if (window.confirm("Leave the interview? Everything answered so far is saved and the interview will end.")) {
+            endInterview();
+        }
+    };
+
+    const toggleMic = () => {
+        const stream = micRef.current.getStream();
+        if (!stream) return;
+        const next = !micOn;
+        stream.getAudioTracks().forEach((t) => (t.enabled = next));
+        setMicOn(next);
+        eventsRef.current.push({ type: next ? "mic_unmuted" : "mic_muted", at: new Date().toISOString() });
+    };
+
+    const toggleCam = () => {
+        const stream = videoRef.current.getStream();
+        if (!stream) return;
+        const next = !camOn;
+        stream.getVideoTracks().forEach((t) => (t.enabled = next));
+        setCamOn(next);
+        eventsRef.current.push({ type: next ? "camera_on" : "camera_off", at: new Date().toISOString() });
+    };
+
+    const enableSound = async () => {
+        await resumeAudio();
+        setSoundBlocked(false);
+    };
+
+    // Progress + timer
+    const totalSec = plannedDurationSec || 300;
+    const pct = Math.min(100, (elapsed / totalSec) * 100);
+    const remaining = Math.max(0, totalSec - elapsed);
+
+    const pillKey: PillKey =
+        status === "live"
+            ? "live"
+            : status === "connecting"
+                ? "connecting"
+                : status === "error"
+                    ? "error"
+                    : "ended";
+    const pill = STATUS_COPY[pillKey];
+
+    const VOICE_COPY = {
+        listening: "Listening to you",
+        speaking: "Interviewer is speaking",
+        thinking: "Thinking…",
+    } as const;
+    const voiceColor =
+        voiceState === "speaking" ? "#5B4A82" : voiceState === "thinking" ? "#8A6D1D" : "#24427A";
 
     return (
-        <div
-            className="min-h-screen w-full flex flex-col"
-            style={{ backgroundColor: "#F6F4EE", color: "#1E2128" }}
-        >
-            <audio ref={audioRef} autoPlay />
+        <div className="h-screen w-full flex flex-col overflow-hidden" style={{ backgroundColor: "#F6F4EE", color: "#1E2128" }}>
+            {/* 1. Thin progress bar — time used */}
+            <div className="w-full" style={{ height: 4, backgroundColor: "#E7E2D3" }}>
+                <div
+                    className="h-full transition-all duration-1000"
+                    style={{
+                        width: `${pct}%`,
+                        backgroundColor: remaining <= 60 ? "#9C3B2E" : "#24427A",
+                    }}
+                />
+            </div>
 
-            {/* Masthead */}
+            {/* 2. Header bar */}
             <div
-                className="flex items-center justify-between px-6 sm:px-10 py-6"
+                className="flex items-center justify-between px-5 sm:px-8 py-3.5 shrink-0"
                 style={{ borderBottom: "1px solid #DAD5C7" }}
             >
-                <div>
-                    <p
-                        className="text-xs font-medium uppercase tracking-[0.2em]"
-                        style={{ color: "#63666F", fontFamily: "'IBM Plex Mono', monospace" }}
-                    >
-                        Live interview
-                    </p>
-                    <h1
-                        className="mt-1 text-2xl sm:text-3xl"
+                <div className="flex items-baseline gap-3 min-w-0">
+                    <span
+                        className="text-xl shrink-0"
                         style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontWeight: 600 }}
                     >
-                        Session {interviewId}
-                    </h1>
-                </div>
-
-                <div className="flex items-center gap-5">
+                        Intervia
+                    </span>
+                    <span style={{ color: "#C9C4B4" }}>·</span>
                     <span
-                        className="text-sm tabular-nums"
+                        className="text-sm truncate"
+                        style={{ color: "#63666F", fontFamily: "'IBM Plex Mono', monospace" }}
+                    >
+                        {roleTitle}
+                    </span>
+                </div>
+                <div className="flex items-center gap-4 shrink-0">
+                    <span
+                        className="text-sm tabular-nums hidden sm:inline"
                         style={{
                             fontFamily: "'IBM Plex Mono', monospace",
-                            color: status === "live" && remaining <= 60 ? "#9C3B2E" : "#63666F",
-                            fontWeight: status === "live" && remaining <= 60 ? 500 : 400,
+                            color: remaining <= 60 ? "#9C3B2E" : "#63666F",
+                            fontWeight: remaining <= 60 ? 500 : 400,
                         }}
                     >
-                        {formatElapsed(remaining)}
+                        {formatElapsed(elapsed)} of {Math.round(totalSec / 60)} min
                     </span>
-                    <div className="flex items-center gap-2">
-                        <span
-                            className="h-2 w-2 rounded-full"
-                            style={{
-                                backgroundColor: statusMeta.color,
-                                boxShadow: status === "live" ? `0 0 0 4px ${statusMeta.color}22` : "none",
-                            }}
-                        />
-                        <span
-                            className="text-xs uppercase tracking-widest"
-                            style={{ fontFamily: "'IBM Plex Mono', monospace", color: statusMeta.color }}
-                        >
-                            {statusMeta.label}
-                        </span>
-                    </div>
+                    <span
+                        className="rounded-full px-3 py-1 text-[10px] uppercase tracking-widest"
+                        style={{
+                            backgroundColor: pill.bg,
+                            color: pill.color,
+                            fontFamily: "'IBM Plex Mono', monospace",
+                        }}
+                    >
+                        {pill.label}
+                    </span>
                 </div>
             </div>
 
-            {/* Main stage */}
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-0 min-h-0">
-                {/* Speaker panels */}
-                <div
-                    className="flex flex-col items-center justify-center gap-10 px-8 py-12"
-                    style={{ borderRight: "1px solid #DAD5C7" }}
-                >
-                    <VoicePanel
-                        label="You"
-                        color="#24427A"
-                        active={mic.active ?? status === "live"}
-                        variant="pulse"
-                    />
-                    <VoicePanel
-                        label="Interviewer"
-                        color="#5B4A82"
-                        active={aiSpeaking}
-                        variant="bars"
-                    />
+            {/* Main area: center stage + conversation sidebar */}
+            <div className="flex-1 min-h-0 flex flex-col md:flex-row">
+                {/* 3. Center stage */}
+                <div className="flex-1 min-h-0 flex flex-col items-center justify-center px-6 py-8 relative">
+                    {/* Voice state */}
+                    <VoiceOrb color={voiceColor} active={voiceState !== "listening"} />
+                    <p
+                        className="mt-4 text-xs uppercase tracking-[0.2em]"
+                        style={{ color: voiceColor, fontFamily: "'IBM Plex Mono', monospace" }}
+                    >
+                        {VOICE_COPY[voiceState]}
+                    </p>
 
-                    {video.active && (
-                        <div className="flex flex-col items-center gap-2">
-                            <video
-                                ref={previewRef}
-                                autoPlay
-                                playsInline
-                                muted
-                                className="rounded-lg"
-                                style={{
-                                    width: 180,
-                                    transform: "scaleX(-1)",
-                                    border: "1px solid #DAD5C7",
-                                    backgroundColor: "#1E2128",
-                                }}
-                            />
-                            <span
-                                className="text-[10px] uppercase tracking-widest"
-                                style={{
-                                    fontFamily: "'IBM Plex Mono', monospace",
-                                    color: "#63666F",
-                                }}
+                    {/* Large question line */}
+                    <div className="mt-8 max-w-2xl text-center min-h-[96px] flex items-center justify-center">
+                        {lastQuestion ? (
+                            <p
+                                className="text-xl sm:text-2xl leading-snug"
+                                style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontWeight: 400 }}
                             >
-                                Camera — sampled for the video report
-                            </span>
-                        </div>
+                                “{lastQuestion}”
+                            </p>
+                        ) : (
+                            <p className="text-lg" style={{ color: "#9A9789", fontFamily: "'Source Serif 4', Georgia, serif", fontStyle: "italic" }}>
+                                The interviewer's question will appear here.
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Conditional sound-enable */}
+                    {soundBlocked && status === "live" && (
+                        <button
+                            onClick={enableSound}
+                            className="mt-6 rounded-full px-6 py-3 text-xs uppercase tracking-widest transition-colors"
+                            style={{ backgroundColor: "#8A6D1D", color: "#F6F4EE", fontFamily: "'IBM Plex Mono', monospace" }}
+                        >
+                            Turn on sound to hear the interviewer
+                        </button>
                     )}
                 </div>
 
-                {/* Live transcript */}
-                <div className="flex flex-col min-h-0 px-8 py-8">
-                    <p
-                        className="text-xs font-medium uppercase tracking-widest shrink-0"
-                        style={{ color: "#63666F", fontFamily: "'IBM Plex Mono', monospace" }}
+                {/* 4. Conversation sidebar (desktop right / mobile bottom panel) */}
+                {showConversation && (
+                    <div
+                        className="order-2 md:order-none md:w-[340px] shrink-0 flex flex-col min-h-0"
+                        style={{ borderLeft: "1px solid #DAD5C7", borderTop: "1px solid #DAD5C7", maxHeight: "40vh" }}
                     >
-                        Live transcript
-                    </p>
-
-                    <div className="mt-5 flex-1 overflow-y-auto space-y-4 pr-2">
-                        {transcript.length === 0 ? (
-                            <p
-                                className="text-sm"
-                                style={{ color: "#9A9789", fontFamily: "'IBM Plex Mono', monospace" }}
-                            >
-                                Transcript will appear here as the conversation begins.
-                            </p>
-                        ) : (
-                            transcript.map((line, i) => (
-                                <div key={i} className="flex gap-3">
+                        <p
+                            className="px-5 pt-4 pb-3 text-[10px] uppercase tracking-widest shrink-0"
+                            style={{ color: "#63666F", fontFamily: "'IBM Plex Mono', monospace" }}
+                        >
+                            Conversation so far
+                        </p>
+                        <div className="flex-1 overflow-y-auto transcript-scroll px-5 pb-4 space-y-3">
+                            {transcript.length === 0 && (
+                                <p className="text-xs" style={{ color: "#9A9789", fontFamily: "'IBM Plex Mono', monospace" }}>
+                                    Transcript will appear here as the conversation begins.
+                                </p>
+                            )}
+                            {transcript.map((line, i) => (
+                                <div key={i}>
                                     <span
-                                        className="w-24 shrink-0 text-right text-[11px] uppercase tracking-wider pt-0.5"
+                                        className="text-[10px] uppercase tracking-wider"
                                         style={{
                                             fontFamily: "'IBM Plex Mono', monospace",
                                             color: line.role === "User" ? "#24427A" : "#5B4A82",
                                         }}
                                     >
-                                        {line.role === "User" ? "Candidate" : "Interviewer"}
+                                        {line.role === "User" ? candidateName || "You" : "Intervia"}
                                     </span>
                                     <p
-                                        className="flex-1 text-[14px] leading-relaxed"
-                                        style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+                                        className="text-[13px] leading-relaxed mt-0.5"
+                                        style={{ fontFamily: "'IBM Plex Mono', monospace", color: "#1E2128" }}
                                     >
                                         {line.text}
                                     </p>
                                 </div>
-                            ))
-                        )}
-                        <div ref={transcriptEndRef} />
+                            ))}
+                            <div ref={transcriptEndRef} />
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
-            {/* Controls */}
-            <div className="px-6 sm:px-10 py-6" style={{ borderTop: "1px solid #DAD5C7" }}>
-                <button
-                    onClick={endInterview}
-                    disabled={status === "ended"}
-                    className="w-full rounded-full py-4 text-sm uppercase tracking-widest transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-                    style={{
-                        backgroundColor: "#9C3B2E",
-                        color: "#F6F4EE",
-                        fontFamily: "'IBM Plex Mono', monospace",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#82301F")}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#9C3B2E")}
+            {/* 5. Footer */}
+            <div
+                className="shrink-0 px-5 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center gap-4"
+                style={{ borderTop: "1px solid #DAD5C7" }}
+            >
+                {/* Left: self view */}
+                <div className="flex items-center gap-3 shrink-0">
+                    <div
+                        className="relative rounded-md overflow-hidden"
+                        style={{ width: 96, height: 72, backgroundColor: "#1E2128", border: "1px solid #DAD5C7" }}
+                    >
+                        <video
+                            ref={previewRef}
+                            autoPlay
+                            playsInline
+                            muted
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                transform: "scaleX(-1)",
+                                opacity: camOn ? 1 : 0.25,
+                            }}
+                        />
+                        {!camOn && (
+                            <span
+                                className="absolute inset-0 flex items-center justify-center text-[9px] uppercase tracking-widest"
+                                style={{ color: "#9A9789", fontFamily: "'IBM Plex Mono', monospace" }}
+                            >
+                                camera off
+                            </span>
+                        )}
+                    </div>
+                    <span
+                        className="rounded-full px-3 py-1 text-[10px] uppercase tracking-widest"
+                        style={{
+                            backgroundColor: "#E9E9F2",
+                            color: "#5B4A82",
+                            fontFamily: "'IBM Plex Mono', monospace",
+                        }}
+                    >
+                        {candidateName || "You"}
+                    </span>
+                </div>
+
+                {/* Center-left note */}
+                <p
+                    className="flex-1 text-xs leading-relaxed hidden md:block"
+                    style={{ color: "#9A9789", fontFamily: "'IBM Plex Mono', monospace" }}
                 >
-                    End interview
-                </button>
+                    Take your time to think. You can interrupt at any point.
+                    <br />
+                    This interview is recorded.
+                </p>
+
+                {/* Right controls */}
+                <div className="flex items-center justify-end gap-2 flex-wrap shrink-0">
+                    <PillButton
+                        onClick={() => setShowConversation((v) => !v)}
+                        label={showConversation ? "Hide conversation" : "Show conversation"}
+                        active={false}
+                    />
+                    <PillButton
+                        onClick={toggleMic}
+                        label={micOn ? "Mute" : "Unmute"}
+                        danger={!micOn}
+                    />
+                    <PillButton
+                        onClick={toggleCam}
+                        label={camOn ? "Camera off" : "Camera on"}
+                        danger={!camOn}
+                    />
+                    <button
+                        onClick={leaveInterview}
+                        className="rounded-full px-5 py-2.5 text-xs uppercase tracking-widest transition-colors"
+                        style={{ backgroundColor: "#9C3B2E", color: "#F6F4EE", fontFamily: "'IBM Plex Mono', monospace" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#82301F")}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#9C3B2E")}
+                    >
+                        Leave interview
+                    </button>
+                </div>
             </div>
         </div>
     );
 };
 
-function VoicePanel({
-    label,
-    color,
-    active,
-    variant,
-}: {
-    label: string;
-    color: string;
-    active: boolean;
-    variant: "pulse" | "bars";
-}) {
+function VoiceOrb({ color, active }: { color: string; active: boolean }) {
+    const heights = [14, 30, 20, 38, 16, 28, 12];
     return (
-        <div className="flex flex-col items-center gap-4">
-            <div
-                className="relative flex items-center justify-center rounded-full"
-                style={{
-                    width: 132,
-                    height: 132,
-                    border: `1.5px solid ${color}`,
-                    backgroundColor: active ? `${color}0F` : "transparent",
-                    transition: "background-color 0.2s ease",
-                }}
-            >
-                {active && (
+        <div
+            className="relative flex items-center justify-center rounded-full"
+            style={{
+                width: 168,
+                height: 168,
+                border: `1.5px solid ${color}`,
+                backgroundColor: active ? `${color}0F` : "transparent",
+                transition: "background-color 0.25s ease",
+            }}
+        >
+            {active && (
+                <span
+                    className="absolute inset-0 rounded-full animate-ping"
+                    style={{ border: `1.5px solid ${color}`, opacity: 0.35 }}
+                />
+            )}
+            <div className="flex items-end gap-1.5" style={{ height: 44 }}>
+                {heights.map((h, i) => (
                     <span
-                        className="absolute inset-0 rounded-full animate-ping"
-                        style={{ border: `1.5px solid ${color}`, opacity: 0.4 }}
-                    />
-                )}
-                {variant === "bars" ? (
-                    <BarsIcon color={color} active={active} />
-                ) : (
-                    <span
-                        className="rounded-full"
+                        key={i}
+                        className={active ? "animate-bounce" : ""}
                         style={{
-                            width: 14,
-                            height: 14,
+                            width: 4,
+                            height: active ? h : 8,
                             backgroundColor: color,
-                            opacity: active ? 1 : 0.35,
+                            opacity: active ? 1 : 0.3,
+                            borderRadius: 2,
+                            animationDelay: `${i * 100}ms`,
+                            animationDuration: "700ms",
+                            transition: "height 0.2s ease",
                         }}
                     />
-                )}
+                ))}
             </div>
-            <span
-                className="text-xs uppercase tracking-widest"
-                style={{ fontFamily: "'IBM Plex Mono', monospace", color }}
-            >
-                {label}
-            </span>
         </div>
     );
 }
 
-function BarsIcon({ color, active }: { color: string; active: boolean }) {
-    const heights = [10, 20, 14, 24, 10];
+function PillButton({
+    onClick,
+    label,
+    danger,
+    active,
+}: {
+    onClick: () => void;
+    label: string;
+    danger?: boolean;
+    active?: boolean;
+}) {
+    const bg = danger ? "#FBEEEA" : "#E9E9F2";
+    const fg = danger ? "#9C3B2E" : "#5B4A82";
     return (
-        <div className="flex items-end gap-1" style={{ height: 24 }}>
-            {heights.map((h, i) => (
-                <span
-                    key={i}
-                    className={active ? "animate-bounce" : ""}
-                    style={{
-                        width: 3,
-                        height: active ? h : 6,
-                        backgroundColor: color,
-                        opacity: active ? 1 : 0.35,
-                        borderRadius: 2,
-                        animationDelay: `${i * 90}ms`,
-                        animationDuration: "600ms",
-                        transition: "height 0.15s ease",
-                    }}
-                />
-            ))}
-        </div>
+        <button
+            onClick={onClick}
+            className="rounded-full px-4 py-2.5 text-xs uppercase tracking-widest transition-colors"
+            style={{
+                backgroundColor: active ? "#24427A" : bg,
+                color: active ? "#F6F4EE" : fg,
+                fontFamily: "'IBM Plex Mono', monospace",
+                border: "1px solid #DAD5C7",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.filter = "brightness(0.95)")}
+            onMouseLeave={(e) => (e.currentTarget.style.filter = "")}
+        >
+            {label}
+        </button>
     );
 }
 

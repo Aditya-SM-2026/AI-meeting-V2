@@ -3,6 +3,7 @@ import {BrowserRouter, Route, Routes} from "react-router-dom"
 import { Home } from './Pages/Home'
 import { Room } from './Pages/Room'
 import { Report } from './Pages/Report'
+import { Reports } from './Pages/Reports'
 
 
 function App() {
@@ -11,6 +12,7 @@ function App() {
 		<Routes>
 			<Route path='/' element={<Home/>} />
 			<Route path='/home' element={<Home/>} />
+			<Route path='/reports' element={<Reports/>} />
 			<Route path='/room/:token' element={<Room/>} />
 			<Route path='/report/:interviewId' element={<Report/>} />
 		</Routes>

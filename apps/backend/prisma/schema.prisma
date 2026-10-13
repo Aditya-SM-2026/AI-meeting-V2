@@ -43,6 +43,7 @@ model Interview{
   humanDecision    Json?
   report           Json?
   reportModel      String?
+  recordingToken   String?
 }
 
 model Message {
@@ -52,6 +53,8 @@ model Message {
   interviewId     String
   interview       Interview @relation(fields: [interviewId],references: [id])
   createdAt       DateTime  @default(now())
+  startedAt       DateTime?
+  endedAt         DateTime?
 }
 
 enum MessageType{

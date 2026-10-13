@@ -47,7 +47,16 @@ export function useAudioPlayer() {
     nextPlayTimeRef.current = 0;
   }, []);
 
-  return { playChunk, reset };
+  /** 'suspended' means the browser blocked audio until a user gesture. */
+  const audioState = useCallback((): string => audioCtxRef.current?.state ?? 'none', []);
+
+  const resumeAudio = useCallback(async () => {
+    if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+      await audioCtxRef.current.resume();
+    }
+  }, []);
+
+  return { playChunk, reset, audioState, resumeAudio };
 }
 
 function base64ToArrayBuffer(base64: string): ArrayBuffer {

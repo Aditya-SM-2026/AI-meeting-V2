@@ -7,6 +7,7 @@ export interface UseMicStreamResult {
   stop: () => void;
   active: boolean;
   level: number;
+  getStream: () => MediaStream | null;
 }
 
 export type ChunkHandler = (chunk: string) => void;
@@ -70,7 +71,9 @@ export function useMicStream(onChunk: ChunkHandler): UseMicStreamResult {
     setLevel(0);
   }, []);
 
-  return { start, stop, active, level };
+  const getStream = useCallback((): MediaStream | null => streamRef.current, []);
+
+  return { start, stop, active, level, getStream };
 }
 
 function downsampleTo16k(buffer: Float32Array, inputRate: number, targetRate: number): Float32Array {

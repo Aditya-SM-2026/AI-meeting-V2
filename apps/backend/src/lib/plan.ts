@@ -16,10 +16,11 @@ export interface InterviewPlan {
     fallback?: boolean;
 }
 
-export async function generatePlan(resumeText: string | null, jobDescription: string): Promise<InterviewPlan> {
+export async function generatePlan(resumeText: string | null, jobDescription: string, roleHint?: string | null): Promise<InterviewPlan> {
     try {
         const plan = await callGeminiJson([
             `You design interview plans. From the job description and candidate resume, produce a JSON interview plan.`,
+            ...(roleHint ? [`The role title is EXACTLY "${roleHint}" — use it as roleTitle verbatim.`] : []),
             `Respond with ONLY minified JSON:`,
             `{"roleTitle": "<3-6 word role title>", "difficulty": "<easy|medium|hard>",`,
             ` "competencies": [{"name": "<competency>", "weight": <0.0-1.0 relative importance>,`,
@@ -46,8 +47,11 @@ export async function generatePlan(resumeText: string | null, jobDescription: st
         if (competencies.length < 2) throw new Error('plan too small');
 
         const difficulty = ['easy', 'medium', 'hard'].includes(plan.difficulty) ? plan.difficulty : 'medium';
+        const roleTitle = roleHint?.trim()
+            ? roleHint.trim().slice(0, 80)
+            : String(plan.roleTitle || 'Interview').slice(0, 80);
         return {
-            roleTitle: String(plan.roleTitle || 'Interview').slice(0, 80),
+            roleTitle,
             difficulty,
             plannedDurationSec: 300,
             competencies,
@@ -55,7 +59,7 @@ export async function generatePlan(resumeText: string | null, jobDescription: st
     } catch (err: any) {
         console.error('Plan generation failed, using fallback:', err?.message);
         return {
-            roleTitle: 'Interview',
+            roleTitle: roleHint?.trim()?.slice(0, 80) || 'Interview',
             difficulty: 'medium',
             plannedDurationSec: 300,
             fallback: true,

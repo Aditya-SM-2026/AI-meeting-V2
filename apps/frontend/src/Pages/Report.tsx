@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 /* ---------- types ---------- */
@@ -30,8 +30,16 @@ interface AuthSignal {
     note: string;
 }
 
-interface VideoMoment { at: number; durationSec: number; kind: string; description: string }
-interface AnswerGaze { turn: number; at: number; framesObserved: number; dominantGaze: string; reading: boolean }
+interface VideoMoment { atSeconds: number; durationSeconds: number; kind: string; description: string }
+interface AnswerGaze {
+    turnSeq: number;
+    whileListening: string;
+    whileAnswering: string;
+    steady: boolean;
+    reading: boolean;
+    note: string;
+    durationSec: number;
+}
 
 interface VideoFactor {
     status: "analysed" | "no_recording" | "not_configured" | "failed";
@@ -39,17 +47,21 @@ interface VideoFactor {
     model?: string;
     score: number | null;
     attentionPct: number | null;
-    frameCount: number;
-    summary: string;
+    recordingId?: string | null;
+    recordingUrl?: string | null;
     moments: VideoMoment[];
-    perAnswer: AnswerGaze[];
+    answers: AnswerGaze[];
     gazePattern: {
         answersObserved: number;
-        habitualListeningDirection: string | null;
+        judgedCount: number;
+        listeningDirection: string | null;
         heldOffScreenDirection: string | null;
-        sameSpotAnswerCount: number;
-        readingAnswerCount: number;
+        sameSpotAnswers: number;
+        readingAnswers: number;
+        sentence: string;
     };
+    segmentsAnalysed?: number;
+    segmentsSkipped?: number;
 }
 
 interface Scorecard {
@@ -115,7 +127,14 @@ interface ResultData {
     resumeText?: string | null;
     scorecard: Scorecard | null;
     humanDecision?: { decision: string; note: string | null; decidedAt: string } | null;
-    recording: { hasRecording: boolean; recordingStartedAt?: string | null; recordingUrl?: string | null };
+    recording: {
+        hasRecording: boolean;
+        recordingId?: string | null;
+        finished?: boolean;
+        size?: number | null;
+        startedAt?: string | null;
+        playUrl?: string | null;
+    };
     transcript: TurnRow[];
     eventLog: any[];
     peers: PeerRow[];
@@ -176,6 +195,15 @@ export const Report = () => {
         }
     };
 
+    // "Try again" only re-fetches — it must never trigger a regeneration.
+    const [retrying, setRetrying] = useState(false);
+    const retryLoad = async () => {
+        setRetrying(true);
+        setError("");
+        await load();
+        setRetrying(false);
+    };
+
     return (
         <div className="min-h-screen w-full" style={{ backgroundColor: "#F6F4EE", color: "#1E2128" }}>
             <div className="mx-auto max-w-4xl px-6 py-14">
@@ -188,7 +216,7 @@ export const Report = () => {
                 </button>
 
                 {loading && <LoadingState regenerating={regenerating} />}
-                {!loading && error && <ErrorState message={error} onRetry={regenerate} retrying={regenerating} />}
+                {!loading && error && <ErrorState message={error} onRetry={retryLoad} retrying={retrying} />}
                 {!loading && !error && data && (
                     <ReportBody data={data} onRegenerate={regenerate} regenerating={regenerating} />
                 )}
@@ -234,6 +262,16 @@ function ErrorState({ message, onRetry, retrying }: { message: string; onRetry: 
 
 function ReportBody({ data, onRegenerate, regenerating }: { data: ResultData; onRegenerate: () => void; regenerating: boolean }) {
     const card = data.scorecard;
+    const playerRef = useRef<HTMLVideoElement | null>(null);
+    const seekTo = (sec: number) => {
+        const el = playerRef.current;
+        if (!el) return;
+        try {
+            el.currentTime = Math.max(0, sec);
+            void el.play().catch(() => {});
+        } catch {}
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+    };
     return (
         <div>
             <SessionHeader data={data} />
@@ -245,10 +283,10 @@ function ReportBody({ data, onRegenerate, regenerating }: { data: ResultData; on
                     <FactorResume card={card} />
                     <FactorAuthenticity card={card} />
                     <IntegritySignals card={card} />
-                    <FactorVideo card={card} />
+                    <FactorVideo card={card} seekTo={seekTo} canSeek={data.recording.hasRecording} />
                 </>
             )}
-            <RecordingPanel data={data} />
+            <RecordingPanel data={data} playerRef={playerRef} />
             <TranscriptPanel data={data} />
             <EventLogPanel data={data} />
             <PeersPanel data={data} />
@@ -546,7 +584,7 @@ const MOMENT_LABELS: Record<string, string> = {
     other: "other",
 };
 
-function FactorVideo({ card }: { card: Scorecard }) {
+function FactorVideo({ card, seekTo, canSeek }: { card: Scorecard; seekTo: (sec: number) => void; canSeek: boolean }) {
     const v = card.factors.video;
     return (
         <Panel
@@ -562,25 +600,36 @@ function FactorVideo({ card }: { card: Scorecard }) {
                 <>
                     <div className="flex flex-wrap items-center gap-3 text-xs" style={{ color: "#63666F", fontFamily: "'IBM Plex Mono', monospace" }}>
                         <span>attention {v.attentionPct ?? "—"}%</span>
-                        <span>· {v.frameCount} frames analysed</span>
+                        <span>· {v.segmentsAnalysed ?? 0} clip{v.segmentsAnalysed === 1 ? "" : "s"} analysed{v.segmentsSkipped ? `, ${v.segmentsSkipped} skipped` : ""}</span>
                         {v.model && <span>· model {v.model}</span>}
                     </div>
-                    {v.summary && <p className="mt-2 text-sm leading-relaxed" style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>{v.summary}</p>}
+
+                    {v.gazePattern?.sentence && (
+                        <p className="mt-2 text-sm leading-relaxed" style={{ fontFamily: "'Source Serif 4', Georgia, serif", color: v.gazePattern.sameSpotAnswers >= 2 ? "#9C3B2E" : "#1E2128" }}>
+                            {v.gazePattern.sentence}
+                        </p>
+                    )}
 
                     {v.moments.length > 0 && (
                         <div className="mt-4">
-                            <p className="text-[10px] uppercase tracking-widest" style={{ color: "#63666F", fontFamily: "'IBM Plex Mono', monospace" }}>Moments to watch</p>
+                            <p className="text-[10px] uppercase tracking-widest" style={{ color: "#63666F", fontFamily: "'IBM Plex Mono', monospace" }}>Moments to watch{canSeek && " — click to jump"}</p>
                             <div className="mt-2 space-y-2">
                                 {v.moments.map((m, i) => (
-                                    <div key={i} className="flex gap-3 rounded-md px-4 py-2.5" style={{ backgroundColor: "#FBEEEA", border: "1px solid #E3C4B8" }}>
+                                    <button
+                                        key={i}
+                                        onClick={() => seekTo(m.atSeconds)}
+                                        disabled={!canSeek}
+                                        className="w-full text-left flex gap-3 rounded-md px-4 py-2.5 transition-opacity disabled:cursor-default hover:opacity-80"
+                                        style={{ backgroundColor: "#FBEEEA", border: "1px solid #E3C4B8" }}
+                                    >
                                         <span className="w-24 shrink-0 text-[11px] tabular-nums pt-0.5" style={{ fontFamily: "'IBM Plex Mono', monospace", color: "#63666F" }}>
-                                            {fmtAt(m.at)} · {m.durationSec}s
+                                            {fmtAt(m.atSeconds)} · {m.durationSeconds}s
                                         </span>
                                         <span className="w-28 shrink-0 text-[10px] uppercase tracking-widest pt-0.5" style={{ fontFamily: "'IBM Plex Mono', monospace", color: "#9C3B2E" }}>
                                             {MOMENT_LABELS[m.kind] || m.kind}
                                         </span>
                                         <span className="flex-1 text-sm">{m.description}</span>
-                                    </div>
+                                    </button>
                                 ))}
                             </div>
                         </div>
@@ -590,10 +639,10 @@ function FactorVideo({ card }: { card: Scorecard }) {
                         <div>
                             <p className="text-[10px] uppercase tracking-widest" style={{ color: "#63666F", fontFamily: "'IBM Plex Mono', monospace" }}>Per-answer gaze</p>
                             <div className="mt-2 space-y-1.5">
-                                {v.perAnswer.length === 0 && <p className="text-sm" style={{ color: "#9A9789" }}>No frames aligned with answers.</p>}
-                                {v.perAnswer.map((a) => (
-                                    <p key={a.turn} className="text-xs" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
-                                        <span style={{ color: "#24427A" }}>T{a.turn}</span> {fmtAt(a.at)} · {a.dominantGaze.replace("_", " ")} ({a.framesObserved} frames){a.reading && <span style={{ color: "#9C3B2E" }}> · reading</span>}
+                                {v.answers.length === 0 && <p className="text-sm" style={{ color: "#9A9789" }}>No answers were observable in the recording.</p>}
+                                {v.answers.map((a) => (
+                                    <p key={a.turnSeq} className="text-xs" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+                                        <span style={{ color: "#24427A" }}>T{a.turnSeq}</span> {Math.round(a.durationSec)}s · listening {a.whileListening.replace("_", " ")} → answering <span style={{ color: a.steady && a.whileAnswering !== "centre" ? "#9C3B2E" : undefined }}>{a.whileAnswering.replace("_", " ")}</span>{a.reading && <span style={{ color: "#9C3B2E" }}> · reading</span>}
                                     </p>
                                 ))}
                             </div>
@@ -601,11 +650,11 @@ function FactorVideo({ card }: { card: Scorecard }) {
                         <div>
                             <p className="text-[10px] uppercase tracking-widest" style={{ color: "#63666F", fontFamily: "'IBM Plex Mono', monospace" }}>Gaze pattern (computed)</p>
                             <div className="mt-2 space-y-1.5 text-xs" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
-                                <p>answers observed: {v.gazePattern.answersObserved}</p>
-                                <p>habitual listening direction: {v.gazePattern.habitualListeningDirection?.replace("_", " ") || "—"}</p>
-                                <p>held off-screen direction while answering: {v.gazePattern.heldOffScreenDirection?.replace("_", " ") || "—"}</p>
-                                <p>same-spot answers: {v.gazePattern.sameSpotAnswerCount}</p>
-                                <p>reading answers: {v.gazePattern.readingAnswerCount}</p>
+                                <p>answers observed: {v.gazePattern.answersObserved} · judged: {v.gazePattern.judgedCount}</p>
+                                <p>listening baseline: {v.gazePattern.listeningDirection?.replace("_", " ") || "—"}</p>
+                                <p>held off-screen direction: {v.gazePattern.heldOffScreenDirection?.replace("_", " ") || "—"}</p>
+                                <p>same-spot answers: {v.gazePattern.sameSpotAnswers}</p>
+                                <p>reading answers: {v.gazePattern.readingAnswers}</p>
                             </div>
                         </div>
                     </div>
@@ -617,23 +666,31 @@ function FactorVideo({ card }: { card: Scorecard }) {
 
 /* ---------- recording ---------- */
 
-function RecordingPanel({ data }: { data: ResultData }) {
-    const url = data.recording.hasRecording && data.recording.recordingUrl
-        ? `${API}${data.recording.recordingUrl}`
+function RecordingPanel({ data, playerRef }: { data: ResultData; playerRef: React.RefObject<HTMLVideoElement | null> }) {
+    const url = data.recording.hasRecording && data.recording.playUrl
+        ? `${API}${data.recording.playUrl}`
         : null;
     return (
         <div className="mt-12">
             <SectionTitle>Recording (recruiter only)</SectionTitle>
             {url ? (
-                <video
-                    controls
-                    src={url}
-                    className="mt-4 w-full rounded-lg"
-                    style={{ backgroundColor: "#1E2128", maxHeight: 420 }}
-                />
+                <>
+                    <video
+                        ref={playerRef}
+                        controls
+                        src={url}
+                        preload="metadata"
+                        className="mt-4 w-full rounded-lg"
+                        style={{ backgroundColor: "#1E2128", maxHeight: 420 }}
+                    />
+                    <p className="mt-2 text-xs" style={{ color: "#9A9789", fontFamily: "'IBM Plex Mono', monospace" }}>
+                        {data.recording.size ? `${(data.recording.size / (1024 * 1024)).toFixed(1)} MB · ` : ""}
+                        {data.recording.finished ? "fully uploaded" : "final chunk not received (page may have closed early)"}
+                    </p>
+                </>
             ) : (
                 <p className="mt-3 text-sm" style={{ color: "#9A9789" }}>
-                    No recording was captured for this session{data.recording.recordingStartedAt ? "" : " (camera may have been denied)"}.
+                    No recording was captured for this session (camera may have been denied).
                 </p>
             )}
         </div>

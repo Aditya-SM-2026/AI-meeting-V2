@@ -60,6 +60,7 @@ export type InterviewMinAggregateOutputType = {
   recordingData: string | null
   recordingStartedAt: Date | null
   reportModel: string | null
+  recordingToken: string | null
 }
 
 export type InterviewMaxAggregateOutputType = {
@@ -82,6 +83,7 @@ export type InterviewMaxAggregateOutputType = {
   recordingData: string | null
   recordingStartedAt: Date | null
   reportModel: string | null
+  recordingToken: string | null
 }
 
 export type InterviewCountAggregateOutputType = {
@@ -112,6 +114,7 @@ export type InterviewCountAggregateOutputType = {
   humanDecision: number
   report: number
   reportModel: number
+  recordingToken: number
   _all: number
 }
 
@@ -150,6 +153,7 @@ export type InterviewMinAggregateInputType = {
   recordingData?: true
   recordingStartedAt?: true
   reportModel?: true
+  recordingToken?: true
 }
 
 export type InterviewMaxAggregateInputType = {
@@ -172,6 +176,7 @@ export type InterviewMaxAggregateInputType = {
   recordingData?: true
   recordingStartedAt?: true
   reportModel?: true
+  recordingToken?: true
 }
 
 export type InterviewCountAggregateInputType = {
@@ -202,6 +207,7 @@ export type InterviewCountAggregateInputType = {
   humanDecision?: true
   report?: true
   reportModel?: true
+  recordingToken?: true
   _all?: true
 }
 
@@ -319,6 +325,7 @@ export type InterviewGroupByOutputType = {
   humanDecision: runtime.JsonValue | null
   report: runtime.JsonValue | null
   reportModel: string | null
+  recordingToken: string | null
   _count: InterviewCountAggregateOutputType | null
   _avg: InterviewAvgAggregateOutputType | null
   _sum: InterviewSumAggregateOutputType | null
@@ -372,6 +379,7 @@ export type InterviewWhereInput = {
   humanDecision?: Prisma.JsonNullableFilter<"Interview">
   report?: Prisma.JsonNullableFilter<"Interview">
   reportModel?: Prisma.StringNullableFilter<"Interview"> | string | null
+  recordingToken?: Prisma.StringNullableFilter<"Interview"> | string | null
   conversations?: Prisma.MessageListRelationFilter
 }
 
@@ -403,6 +411,7 @@ export type InterviewOrderByWithRelationInput = {
   humanDecision?: Prisma.SortOrderInput | Prisma.SortOrder
   report?: Prisma.SortOrderInput | Prisma.SortOrder
   reportModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  recordingToken?: Prisma.SortOrderInput | Prisma.SortOrder
   conversations?: Prisma.MessageOrderByRelationAggregateInput
 }
 
@@ -437,6 +446,7 @@ export type InterviewWhereUniqueInput = Prisma.AtLeast<{
   humanDecision?: Prisma.JsonNullableFilter<"Interview">
   report?: Prisma.JsonNullableFilter<"Interview">
   reportModel?: Prisma.StringNullableFilter<"Interview"> | string | null
+  recordingToken?: Prisma.StringNullableFilter<"Interview"> | string | null
   conversations?: Prisma.MessageListRelationFilter
 }, "id" | "shareToken">
 
@@ -468,6 +478,7 @@ export type InterviewOrderByWithAggregationInput = {
   humanDecision?: Prisma.SortOrderInput | Prisma.SortOrder
   report?: Prisma.SortOrderInput | Prisma.SortOrder
   reportModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  recordingToken?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.InterviewCountOrderByAggregateInput
   _avg?: Prisma.InterviewAvgOrderByAggregateInput
   _max?: Prisma.InterviewMaxOrderByAggregateInput
@@ -506,6 +517,7 @@ export type InterviewScalarWhereWithAggregatesInput = {
   humanDecision?: Prisma.JsonNullableWithAggregatesFilter<"Interview">
   report?: Prisma.JsonNullableWithAggregatesFilter<"Interview">
   reportModel?: Prisma.StringNullableWithAggregatesFilter<"Interview"> | string | null
+  recordingToken?: Prisma.StringNullableWithAggregatesFilter<"Interview"> | string | null
 }
 
 export type InterviewCreateInput = {
@@ -536,6 +548,7 @@ export type InterviewCreateInput = {
   humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportModel?: string | null
+  recordingToken?: string | null
   conversations?: Prisma.MessageCreateNestedManyWithoutInterviewInput
 }
 
@@ -567,6 +580,7 @@ export type InterviewUncheckedCreateInput = {
   humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportModel?: string | null
+  recordingToken?: string | null
   conversations?: Prisma.MessageUncheckedCreateNestedManyWithoutInterviewInput
 }
 
@@ -598,6 +612,7 @@ export type InterviewUpdateInput = {
   humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recordingToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversations?: Prisma.MessageUpdateManyWithoutInterviewNestedInput
 }
 
@@ -629,6 +644,7 @@ export type InterviewUncheckedUpdateInput = {
   humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recordingToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversations?: Prisma.MessageUncheckedUpdateManyWithoutInterviewNestedInput
 }
 
@@ -660,6 +676,7 @@ export type InterviewCreateManyInput = {
   humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportModel?: string | null
+  recordingToken?: string | null
 }
 
 export type InterviewUpdateManyMutationInput = {
@@ -690,6 +707,7 @@ export type InterviewUpdateManyMutationInput = {
   humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recordingToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InterviewUncheckedUpdateManyInput = {
@@ -720,6 +738,7 @@ export type InterviewUncheckedUpdateManyInput = {
   humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recordingToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InterviewCountOrderByAggregateInput = {
@@ -750,6 +769,7 @@ export type InterviewCountOrderByAggregateInput = {
   humanDecision?: Prisma.SortOrder
   report?: Prisma.SortOrder
   reportModel?: Prisma.SortOrder
+  recordingToken?: Prisma.SortOrder
 }
 
 export type InterviewAvgOrderByAggregateInput = {
@@ -779,6 +799,7 @@ export type InterviewMaxOrderByAggregateInput = {
   recordingData?: Prisma.SortOrder
   recordingStartedAt?: Prisma.SortOrder
   reportModel?: Prisma.SortOrder
+  recordingToken?: Prisma.SortOrder
 }
 
 export type InterviewMinOrderByAggregateInput = {
@@ -801,6 +822,7 @@ export type InterviewMinOrderByAggregateInput = {
   recordingData?: Prisma.SortOrder
   recordingStartedAt?: Prisma.SortOrder
   reportModel?: Prisma.SortOrder
+  recordingToken?: Prisma.SortOrder
 }
 
 export type InterviewSumOrderByAggregateInput = {
@@ -881,6 +903,7 @@ export type InterviewCreateWithoutConversationsInput = {
   humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportModel?: string | null
+  recordingToken?: string | null
 }
 
 export type InterviewUncheckedCreateWithoutConversationsInput = {
@@ -911,6 +934,7 @@ export type InterviewUncheckedCreateWithoutConversationsInput = {
   humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportModel?: string | null
+  recordingToken?: string | null
 }
 
 export type InterviewCreateOrConnectWithoutConversationsInput = {
@@ -957,6 +981,7 @@ export type InterviewUpdateWithoutConversationsInput = {
   humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recordingToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InterviewUncheckedUpdateWithoutConversationsInput = {
@@ -987,6 +1012,7 @@ export type InterviewUncheckedUpdateWithoutConversationsInput = {
   humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recordingToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1048,6 +1074,7 @@ export type InterviewSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   humanDecision?: boolean
   report?: boolean
   reportModel?: boolean
+  recordingToken?: boolean
   conversations?: boolean | Prisma.Interview$conversationsArgs<ExtArgs>
   _count?: boolean | Prisma.InterviewCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["interview"]>
@@ -1080,6 +1107,7 @@ export type InterviewSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   humanDecision?: boolean
   report?: boolean
   reportModel?: boolean
+  recordingToken?: boolean
 }, ExtArgs["result"]["interview"]>
 
 export type InterviewSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1110,6 +1138,7 @@ export type InterviewSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   humanDecision?: boolean
   report?: boolean
   reportModel?: boolean
+  recordingToken?: boolean
 }, ExtArgs["result"]["interview"]>
 
 export type InterviewSelectScalar = {
@@ -1140,9 +1169,10 @@ export type InterviewSelectScalar = {
   humanDecision?: boolean
   report?: boolean
   reportModel?: boolean
+  recordingToken?: boolean
 }
 
-export type InterviewOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "githubMetadata" | "status" | "score" | "feedback" | "videoScore" | "videoFeedback" | "candidateName" | "candidateEmail" | "recruiterName" | "resumeText" | "jobDescription" | "shareToken" | "startedAt" | "completedAt" | "sessionMetrics" | "integrityReport" | "aiProbability" | "plan" | "difficulty" | "plannedDurationSec" | "recordingData" | "recordingStartedAt" | "sessionEvents" | "humanDecision" | "report" | "reportModel", ExtArgs["result"]["interview"]>
+export type InterviewOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "githubMetadata" | "status" | "score" | "feedback" | "videoScore" | "videoFeedback" | "candidateName" | "candidateEmail" | "recruiterName" | "resumeText" | "jobDescription" | "shareToken" | "startedAt" | "completedAt" | "sessionMetrics" | "integrityReport" | "aiProbability" | "plan" | "difficulty" | "plannedDurationSec" | "recordingData" | "recordingStartedAt" | "sessionEvents" | "humanDecision" | "report" | "reportModel" | "recordingToken", ExtArgs["result"]["interview"]>
 export type InterviewInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversations?: boolean | Prisma.Interview$conversationsArgs<ExtArgs>
   _count?: boolean | Prisma.InterviewCountOutputTypeDefaultArgs<ExtArgs>
@@ -1183,6 +1213,7 @@ export type $InterviewPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     humanDecision: runtime.JsonValue | null
     report: runtime.JsonValue | null
     reportModel: string | null
+    recordingToken: string | null
   }, ExtArgs["result"]["interview"]>
   composites: {}
 }
@@ -1634,6 +1665,7 @@ export interface InterviewFieldRefs {
   readonly humanDecision: Prisma.FieldRef<"Interview", 'Json'>
   readonly report: Prisma.FieldRef<"Interview", 'Json'>
   readonly reportModel: Prisma.FieldRef<"Interview", 'String'>
+  readonly recordingToken: Prisma.FieldRef<"Interview", 'String'>
 }
     
 

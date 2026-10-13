@@ -98,7 +98,8 @@ export const InterviewScalarFieldEnum = {
   sessionEvents: 'sessionEvents',
   humanDecision: 'humanDecision',
   report: 'report',
-  reportModel: 'reportModel'
+  reportModel: 'reportModel',
+  recordingToken: 'recordingToken'
 } as const
 
 export type InterviewScalarFieldEnum = (typeof InterviewScalarFieldEnum)[keyof typeof InterviewScalarFieldEnum]
@@ -109,7 +110,9 @@ export const MessageScalarFieldEnum = {
   message: 'message',
   type: 'type',
   interviewId: 'interviewId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt'
 } as const
 
 export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]

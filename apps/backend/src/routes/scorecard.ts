@@ -1,14 +1,14 @@
 import prisma from '../lib/prisma.js';
 import { buildScorecard, type Turn } from '../lib/grader.js';
-import { computeVideoFactor, type VideoFactor } from '../lib/video.js';
+import { analyzeRecordingForInterview, type VideoFactorResult } from '../lib/videoAnalysis.js';
 
-export async function loadTurns(interviewId: string): Promise<Turn[]> {
+export async function loadTurns(interviewId: string): Promise<(Turn & { startedAt: Date; endedAt: Date })[]> {
     const messages = await prisma.message.findMany({
         where: { interviewId },
         orderBy: { createdAt: 'asc' },
     });
 
-    const turns: Turn[] = [];
+    const turns: (Turn & { startedAt: Date; endedAt: Date })[] = [];
     let prevAssistanceAt: number | null = null;
     messages.forEach((m, i) => {
         const at = m.createdAt;
@@ -22,6 +22,8 @@ export async function loadTurns(interviewId: string): Promise<Turn[]> {
             text: m.message,
             at,
             latencySec,
+            startedAt: m.startedAt || at,
+            endedAt: m.endedAt || at,
         });
         if (m.type === 'Assistance') prevAssistanceAt = at.getTime();
     });
@@ -29,7 +31,23 @@ export async function loadTurns(interviewId: string): Promise<Turn[]> {
     return turns;
 }
 
-export async function generateScorecardFor(interviewId: string): Promise<any | null> {
+// Concurrent generation for the same interview shares a single promise.
+const inFlight = new Map<string, Promise<any | null>>();
+
+export function generateScorecardFor(interviewId: string): Promise<any | null> {
+    const existing = inFlight.get(interviewId);
+    if (existing) return existing;
+    const job = generateScorecardInner(interviewId).finally(() => inFlight.delete(interviewId));
+    inFlight.set(interviewId, job);
+    return job;
+}
+
+async function generateScorecardInner(interviewId: string): Promise<any | null> {
+    // Double-check the cache after acquiring the slot — another request may
+    // have finished while this one was queued.
+    const fresh = await prisma.interview.findUnique({ where: { id: interviewId } });
+    if (fresh?.report) return fresh.report;
+
     const interview = await prisma.interview.findUnique({ where: { id: interviewId } });
     if (!interview) return null;
 
@@ -48,12 +66,7 @@ export async function generateScorecardFor(interviewId: string): Promise<any | n
         ? (interview.completedAt.getTime() - interview.startedAt.getTime()) / 1000
         : 0;
 
-    const videoFactor: VideoFactor = computeVideoFactor(interview.videoFeedback as any, {
-        recordingStartedAt: interview.recordingStartedAt,
-        startedAt: interview.startedAt,
-        messages: turns.map((t) => ({ type: t.speaker === 'Candidate' ? 'User' : 'Assistance', createdAt: t.at })),
-        totalInterviewSec: durationSec,
-    });
+    const videoFactor: VideoFactorResult = await analyzeRecordingForInterview(interviewId);
 
     const scorecard = await buildScorecard({
         turns,

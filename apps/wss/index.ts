@@ -26,6 +26,9 @@ wss.on('connection', function connection(ws) {
     let candidate: any = null;
     let geminiWS: WebSocket | null = null;
 
+    let candidateTurnStartedAt: Date | null = null;
+    let interviewerTurnStartedAt: Date | null = null;
+
     const metrics: any = {
         startedAt: null as string | null,
         turnCount: 0,
@@ -159,6 +162,7 @@ wss.on('connection', function connection(ws) {
                     }
 
                     if (sc?.modelTurn?.parts) {
+                        if (!interviewerTurnStartedAt) interviewerTurnStartedAt = new Date();
                         for (const part of sc.modelTurn.parts) {
                             if (part.inlineData?.data) {
                                 safeSend(ws, { type: 'audio', payload: { data: part.inlineData.data } });
@@ -167,6 +171,7 @@ wss.on('connection', function connection(ws) {
                     }
 
                     if (sc?.inputTranscription?.text) {
+                        if (!candidateTurnStartedAt) candidateTurnStartedAt = new Date();
                         candidateBuffer += sc.inputTranscription.text;
                         metrics.candidateChars += sc.inputTranscription.text.length;
                         if (metrics.awaitingCandidateSpeech && metrics.lastTurnCompleteAt) {
@@ -184,10 +189,13 @@ wss.on('connection', function connection(ws) {
                         metrics.turnCount++;
                         metrics.lastTurnCompleteAt = Date.now();
                         metrics.awaitingCandidateSpeech = true;
-                        await persistTranscriptEntry('User', candidateBuffer);
-                        await persistTranscriptEntry('Assistance', interviewerBuffer);
+                        const turnEndedAt = new Date();
+                        await persistTranscriptEntry('User', candidateBuffer, candidateTurnStartedAt, turnEndedAt);
+                        await persistTranscriptEntry('Assistance', interviewerBuffer, interviewerTurnStartedAt, turnEndedAt);
                         candidateBuffer = '';
                         interviewerBuffer = '';
+                        candidateTurnStartedAt = null;
+                        interviewerTurnStartedAt = null;
                         safeSend(ws, { type: 'turnComplete', payload: { candidateId: candidate.id } });
                     }
 
@@ -298,12 +306,22 @@ wss.on('connection', function connection(ws) {
         }
 
         safeSend(ws, { type: 'interviewComplete', payload: { candidateId: candidate.id } });
+
+        // Generate the scorecard in the background so the recruiter's first
+        // "View report" click is instant (the report is stored once, reused after).
+        const interviewId = candidate.id;
+        setTimeout(() => {
+            fetch(`http://localhost:${process.env.BACKEND_PORT || 3001}/api/v1/interviews/${interviewId}/regenerate`, {
+                method: 'POST',
+            }).catch(() => {});
+        }, 2000);
+
         if (geminiWS && geminiWS.readyState === WebSocket.OPEN) {
             try { geminiWS.close(); } catch {}
         }
     }
 
-    async function persistTranscriptEntry(role: 'User' | 'Assistance', text: string) {
+    async function persistTranscriptEntry(role: 'User' | 'Assistance', text: string, startedAt: Date | null, endedAt: Date) {
         if (!text.trim()) return;
         await prisma.interview.update({
             where: { id: candidate.id },
@@ -311,7 +329,9 @@ wss.on('connection', function connection(ws) {
                 conversations: {
                     create: [{
                         message: text.trim(),
-                        type: role
+                        type: role,
+                        startedAt: startedAt || undefined,
+                        endedAt,
                     }]
                 }
             }
