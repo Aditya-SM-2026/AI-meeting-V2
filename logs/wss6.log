@@ -1,0 +1,40 @@
+WebSocket server running on port 8081
+ 5 | `))}toString(){return this.lines.join(`
+ 6 | `)}};var Lu={red:be,gray:ct,dim:st,bold:G,underline:at,highlightSource:e=>e.highlight()},Vu={red:e=>e,gray:e=>e,dim:e=>e,bold:e=>e,underline:e=>e,highlightSource:e=>e};function qu({message:e,originalMethod:t,isPanic:r,callArguments:n}){return{functionName:`prisma.${t}()`,message:e,isPanic:r??!1,callArguments:n}}function ju({callsite:e,message:t,originalMethod:r,isPanic:n,callArguments:i},o){let s=qu({message:t,originalMethod:r,isPanic:n,callArguments:i});if(!e||typeof window<"u"||process.env.NODE_ENV==="production")return s;let a=e.getLocation();if(!a||!a.lineNumber||!a.columnNumber)return s;let l=Math.max(1,a.lineNumber-3),u=Yt.read(a.fileName)?.slice(l,a.lineNumber),c=u?.lineAt(a.lineNumber);if(u&&c){let p=Bu(c),d=Uu(c);if(!d)return s;s.functionName=`${d.code})`,s.location=a,n||(u=u.mapLineAt(a.lineNumber,m=>m.slice(0,d.openingBraceIndex))),u=o.highlightSource(u);let h=String(u.lastLineNumber).length;if(s.contextLines=u.mapLines((m,E)=>o.gray(String(E).padStart(h))+" "+m).mapLines(m=>o.dim(m)).prependSymbol
+ 7 | `)}function Ju(e){let t=[e.fileName];return e.lineNumber&&t.push(String(e.lineNumber)),e.columnNumber&&t.push(String(e.columnNumber)),t.join(":")}function Xt(e){let t=e.showColors?Lu:Vu,r;return r=ju(e,t),Qu(r,t)}var io=B(an());function Xi(e,t,r){let n=eo(e),i=Hu(n),o=zu(i);o?er(o,t,r):t.addErrorMessage(()=>"Unknown error")}function eo(e){return e.errors.flatMap(t=>t.kind==="Union"?eo(t):[t])}function Hu(e){let t=new Map,r=[];for(let n of e){if(n.kind!=="InvalidArgumentType"){r.push(n);continue}let i=`${n.selectionPath.join(".")}:${n.argumentPath.join(".")}`,o=t.get(i);o?t.set(i,{...n,argument:{...n.argument,typeNames:Gu(o.argument.typeNames,n.argument.typeNames)}}):t.set(i,n)}return r.push(...t.values()),r}function Gu(e,t){return[...new Set(e.concat(t))]}function zu(e){return on(e,(t,r)=>{let n=Zi(t),i=Zi(r);return n!==i?n-i:Yi(t)-Yi(r)})}function Zi(e){let t=0;return Array.isArray(e.selectionPath)&&(t+=e.selectionPath.length),Array.isArray(e.argumentPath)&&(t+=e.argumentPath.length),t}function Yi(e){switch(
+ 8 | `)}getCurrentLineLength(){return this.currentLine.length}indentedCurrentLine(){let t=this.currentLine.padStart(this.currentLine.length+2*this.currentIndent);return this.marginSymbol?this.marginSymbol+t.slice(1):t}};to();var tr=class{constructor(t){this.value=t}write(t){t.write(this.value)}markAsError(){this.value.markAsError()}};var rr=e=>e,nr={bold:rr,red:rr,green:rr,dim:rr,enabled:!1},no={bold:G,red:be,green:lt,dim:st,enabled:!0},Ve={write(e){e.writeLine(",")}};var X=class{constructor(t){this.contents=t}isUnderlined=!1;color=t=>t;underline(){return this.isUnderlined=!0,this}setColor(t){return this.color=t,this}write(t){let r=t.getCurrentLineLength();t.write(this.color(this.contents)),this.isUnderlined&&t.afterNextNewline(()=>{t.write(" ".repeat(r)).writeLine(this.color("~".repeat(this.contents.length)))})}};var me=class{hasError=!1;markAsError(){return this.hasError=!0,this}};var qe=class extends me{items=[];addItem(t){return this.items.push(new tr(t)),this}getField(t){return this.items[t]}getPrintWidth(){r
+ 9 | Note that ${s.bold("include")} statements only accept relation fields.`,a})}function Zu(e,t,r){let n=t.arguments.getDeepSubSelectionValue(e.selectionPath)?.asObject();if(n){let i=n.getField("omit")?.value.asObject();if(i){Yu(e,t,i);return}if(n.hasField("select")){Xu(e,t);return}}if(r?.[de(e.outputType.name)]){ec(e,t);return}t.addErrorMessage(()=>`Unknown field at "${e.selectionPath.join(".")} selection"`)}function Yu(e,t,r){r.removeAllFields();for(let n of e.outputType.fields)r.addSuggestion(new j(n.name,"false"));t.addErrorMessage(n=>`The ${n.red("omit")} statement includes every field of the model ${n.bold(e.outputType.name)}. At least one field must be included in the result`)}function Xu(e,t){let r=e.outputType,n=t.arguments.getDeepSelectionParent(e.selectionPath)?.value,i=n?.isEmpty()??!1;n&&(n.removeAllFields(),ao(n,r)),t.addErrorMessage(o=>i?`The ${o.red("`select`")} statement for type ${o.bold(r.name)} must not be empty. ${bt(o)}`:`The ${o.red("`select`")} statement for type ${o.bold(r.name)} needs ${
+10 | `)}};function Qe(e){return new un(mo(e))}function mo(e){let t=new je;for(let[r,n]of Object.entries(e)){let i=new or(r,fo(n));t.addField(i)}return t}function fo(e){if(typeof e=="string")return new I(JSON.stringify(e));if(typeof e=="number"||typeof e=="boolean")return new I(String(e));if(typeof e=="bigint")return new I(`${e}n`);if(e===null)return new I("null");if(e===void 0)return new I("undefined");if(_e(e))return new I(`new Prisma.Decimal("${e.toFixed()}")`);if(e instanceof Uint8Array)return Buffer.isBuffer(e)?new I(`Buffer.alloc(${e.byteLength})`):new I(`new Uint8Array(${e.byteLength})`);if(e instanceof Date){let t=Fe(e)?e.toISOString():"Invalid Date";return new I(`new Date("${t}")`)}return(0,po.isObjectEnumValue)(e)?new I(`Prisma.${e._getName()}`):Be(e)?new I(`prisma.${de(e.modelName)}.$fields.${e.name}`):Array.isArray(e)?yc(e):typeof e=="object"?mo(e):new I(Object.prototype.toString.call(e))}function yc(e){let t=new qe;for(let r of e)t.addItem(fo(r));return t}function sr(e,t){let r=t==="pretty"?no:nr,n=e.r
+
+PrismaClientValidationError: 
+Invalid `prisma.interview.update()` invocation in
+C:\Users\Aditya\AI-InterviewPlatform\apps\wss\index.ts:75:40
+
+  72     safeSend(ws, { type: 'status', status: 'error', message: 'Invalid interview Id' });
+  73     return;
+  74 }
+→ 75 await prisma.interview.update({
+       where: {
+         id: "1cc00675-7136-4d08-8543-9a592823c3fb"
+       },
+       data: {
+         status: "InProgress",
+         startedAt: new Date("2026-10-13T12:32:51.655Z"),
+         ~~~~~~~~~
+     ?   id?: String | StringFieldUpdateOperationsInput,
+     ?   githubMetadata?: NullableJsonNullValueInput | Json,
+     ?   score?: Int | NullableIntFieldUpdateOperationsInput | Null,
+     ?   feedback?: String | NullableStringFieldUpdateOperationsInput | Null,
+     ?   conversations?: MessageUpdateManyWithoutInterviewNestedInput
+       }
+     })
+
+Unknown argument `startedAt`. Available options are marked with ?.
+ clientVersion: "7.9.0",
+
+      at ar (C:\Users\Aditya\AI-InterviewPlatform\node_modules\@prisma\client\runtime\client.js:10:1374)
+      at handleRequestError (C:\Users\Aditya\AI-InterviewPlatform\node_modules\@prisma\client\runtime\client.js:65:7929)
+      at handleAndLogRequestError (C:\Users\Aditya\AI-InterviewPlatform\node_modules\@prisma\client\runtime\client.js:65:7581)
+      at request (C:\Users\Aditya\AI-InterviewPlatform\node_modules\@prisma\client\runtime\client.js:65:7288)
+
+Bun v1.3.14 (Windows x64)

@@ -8,6 +8,6 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/Interview.js'
-export type * from './models/Message.js'
-export type * from './commonInputTypes.js'
+export type * from './models/Interview.ts'
+export type * from './models/Message.ts'
+export type * from './commonInputTypes.ts'

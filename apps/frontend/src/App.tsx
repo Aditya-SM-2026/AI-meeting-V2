@@ -1,10 +1,8 @@
 import './App.css'
 import {BrowserRouter, Route, Routes} from "react-router-dom"
 import { Home } from './Pages/Home'
-import { Login } from './Pages/Login'
-import { Signup } from './Pages/SignUp'
-import { Interview } from './Pages/Interview'
-import { Result } from './Pages/Result'
+import { Room } from './Pages/Room'
+import { Report } from './Pages/Report'
 
 
 function App() {
@@ -12,11 +10,9 @@ function App() {
     <BrowserRouter>
 		<Routes>
 			<Route path='/' element={<Home/>} />
-			<Route path='/login' element={<Login/>} />
-			<Route path='/signup' element={<Signup/>} />
 			<Route path='/home' element={<Home/>} />
-			<Route path='/interview/:interviewId' element={<Interview/>} />
-			<Route path='/result/:interviewId' element={<Result/>} />
+			<Route path='/room/:token' element={<Room/>} />
+			<Route path='/report/:interviewId' element={<Report/>} />
 		</Routes>
     </BrowserRouter>
   )

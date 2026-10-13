@@ -17,8 +17,8 @@
 
 import * as runtime from "@prisma/client/runtime/index-browser"
 
-export type * from '../models.js'
-export type * from './prismaNamespace.js'
+export type * from '../models.ts'
+export type * from './prismaNamespace.ts'
 
 export const Decimal = runtime.Decimal
 
@@ -76,7 +76,29 @@ export const InterviewScalarFieldEnum = {
   githubMetadata: 'githubMetadata',
   status: 'status',
   score: 'score',
-  feedback: 'feedback'
+  feedback: 'feedback',
+  videoScore: 'videoScore',
+  videoFeedback: 'videoFeedback',
+  candidateName: 'candidateName',
+  candidateEmail: 'candidateEmail',
+  recruiterName: 'recruiterName',
+  resumeText: 'resumeText',
+  jobDescription: 'jobDescription',
+  shareToken: 'shareToken',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  sessionMetrics: 'sessionMetrics',
+  integrityReport: 'integrityReport',
+  aiProbability: 'aiProbability',
+  plan: 'plan',
+  difficulty: 'difficulty',
+  plannedDurationSec: 'plannedDurationSec',
+  recordingData: 'recordingData',
+  recordingStartedAt: 'recordingStartedAt',
+  sessionEvents: 'sessionEvents',
+  humanDecision: 'humanDecision',
+  report: 'report',
+  reportModel: 'reportModel'
 } as const
 
 export type InterviewScalarFieldEnum = (typeof InterviewScalarFieldEnum)[keyof typeof InterviewScalarFieldEnum]
@@ -86,7 +108,8 @@ export const MessageScalarFieldEnum = {
   id: 'id',
   message: 'message',
   type: 'type',
-  interviewId: 'interviewId'
+  interviewId: 'interviewId',
+  createdAt: 'createdAt'
 } as const
 
 export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]

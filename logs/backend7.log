@@ -1,0 +1,77 @@
+server is up
+PayloadTooLargeError: request entity too large
+    at readStream (C:\Users\Aditya\AI-InterviewPlatform\node_modules\raw-body\index.js:163:17)
+    at read (C:\Users\Aditya\AI-InterviewPlatform\node_modules\body-parser\lib\read.js:113:3)
+    at jsonParser (C:\Users\Aditya\AI-InterviewPlatform\node_modules\body-parser\lib\types\json.js:60:5)
+    at handleRequest (C:\Users\Aditya\AI-InterviewPlatform\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\Aditya\AI-InterviewPlatform\node_modules\router\index.js:342:13)
+    at <anonymous> (C:\Users\Aditya\AI-InterviewPlatform\node_modules\router\index.js:297:9)
+    at next (C:\Users\Aditya\AI-InterviewPlatform\node_modules\router\index.js:291:5)
+    at handle (C:\Users\Aditya\AI-InterviewPlatform\node_modules\router\index.js:186:3)
+    at handle (C:\Users\Aditya\AI-InterviewPlatform\node_modules\express\lib\application.js:177:15)
+    at app (C:\Users\Aditya\AI-InterviewPlatform\node_modules\express\lib\express.js:38:9)
+    at emit (node:events:98:22)
+    at onNodeHTTPRequest (node:_http_server:373:22)
+interviewId 27ea2d62-aa23-4f27-86d0-17417d32099a
+**Hiring-Panel Summary**
+
+*   **Strengths:** The candidate demonstrates an understanding of fundamental programming concepts and is able to articulate their preference for JavaScript based on their current project experience (full-stack versatility). They express a pragmatic, albeit simplistic, view toward learning new languages by focusing on shared foundational elements like loops and OOP.
+*   **Weaknesses:** The candidate struggled significantly with professional conduct and communication. During the interview, they were overheard speaking to someone else in a different language regarding an external task or instruction, causing a complete breakdown in the interview process. Their explanation of technical concepts was inconsistent, and they failed to provide a concrete example of conflict resolution or problem-solving, as they did not answer the behavioral questions posed.
+*   **Communication Quality:** Poor. The candidate was distracted, failed to address direct questions, and exhibited a lack of professionalism by engaging in unrelated side conversations during a formal interview. Their technical explanations were disjointed and lacked clarity.
+*   **Final Recommendation:** Strong No Hire. The candidate failed to demonstrate the professionalism, focus, and behavioral competence required for the role.
+
+SCORE: 1 1
+interviewId 27ea2d62-aa23-4f27-86d0-17417d32099a
+**Hiring-Panel Summary**
+
+*   **Strengths:** The candidate demonstrates familiarity with modern development concepts, such as building semantic search APIs and Model Context Protocol (MCP) integrations. They show a pragmatic approach to language learning, correctly identifying that programming fundamentals (loops, OOP) are transferable between JavaScript and Python.
+*   **Weaknesses:** The candidate lacks professional focus during the interview. There was a significant incident where the candidate appeared to be communicating with a third party in a different language regarding the interview process itself ("Do not search on ChatGPT"), which raises serious integrity and professionalism concerns. Additionally, the candidate struggled to maintain a consistent narrative regarding their technical preferences and failed to address the behavioral question regarding conflict resolution.
+*   **Communication Quality:** Poor. The candidate was distracted, failed to answer the prompt regarding conflict resolution, and displayed an inability to maintain interview focus. Their explanation of technical trade-offs between JavaScript and Python was disorganized and lacked clarity.
+*   **Final Recommendation:** Strong No Hire. The candidate's behavior during the interview suggests an attempt to bypass the assessment process dishonestly, and they failed to demonstrate the level of communication and professionalism required for a team-based developer role.
+
+SCORE: 1 1
+interviewId 27ea2d62-aa23-4f27-86d0-17417d32099a
+**Hiring-Panel Summary**
+
+*   **Strengths:** The candidate demonstrates familiarity with modern development concepts, such as semantic search APIs and MCPs (Model Context Protocol). They express a pragmatic approach to learning new programming languages, correctly identifying that foundational concepts (loops, OOP) are transferable across syntax.
+*   **Weaknesses:** The interview was significantly compromised by the candidate’s lack of focus. At one point, the candidate appeared to be distracted by external tasks or personal side conversations in a different language, leading to a complete failure to address the question regarding conflict resolution. Furthermore, the candidate struggled to maintain a consistent technical argument regarding their preference for JavaScript versus Python, appearing somewhat confused about the frameworks and use cases of both.
+*   **Communication Quality:** Poor. The candidate was inattentive, failed to address behavioral questions, and struggled to provide coherent or professional answers. The interaction included off-topic, non-English dialogue that suggests the candidate was not fully engaged in the interview process.
+*   **Recommendation:** Strong No Hire. The candidate's inability to maintain professional decorum and failure to answer key behavioral questions demonstrate a lack of readiness for this role.
+
+SCORE: 2 2
+interviewId 27ea2d62-aa23-4f27-86d0-17417d32099a
+**Hiring-Panel Summary**
+
+**Strengths:**
+*   Demonstrates hands-on experience with technical projects, specifically mentioning the development of a semantic search API and an MCP.
+*   Shows a pragmatic attitude toward learning new programming languages, correctly identifying that foundational concepts (loops, OOP) are transferable across syntax.
+
+**Weaknesses:**
+*   **Professionalism:** The candidate was caught speaking to someone else in a different language during the interview, indicating a lack of preparation and focus.
+*   **Communication:** Answers were often disorganized, repetitive, or contradictory (e.g., oscillating on whether Python is "easier" or "harder" than JavaScript).
+*   **Clarity:** The candidate failed to address the behavioral question regarding team conflict entirely, showing a lack of preparedness for standard interview formats.
+
+**Communication Quality:**
+Poor. The candidate struggled to maintain a professional focus, frequently lost the thread of the conversation, and failed to provide structured, coherent responses. The candidate's inability to manage the interview environment (the side conversation) reflects negatively on their professionalism.
+
+**Final Recommendation:**
+No Hire. The candidate lacks the professional maturity and communication discipline required for a junior developer role.
+
+SCORE: 2 2
+interviewId 27ea2d62-aa23-4f27-86d0-17417d32099a
+**Hiring-Panel Summary**
+
+**Strengths:**
+Irra demonstrates a baseline familiarity with development concepts, specifically within the JavaScript ecosystem (TypeScript). She shows an understanding of fundamental programming principles, correctly identifying that core logic (loops, OOP) is transferable between languages.
+
+**Weaknesses:**
+The candidate displayed significant professional conduct issues. During the interview, she was distracted by an external conversation (in Telugu), which was irrelevant to the interview and disrupted the flow of the assessment. She failed to answer the conflict-resolution question entirely, even after being prompted to restart. Her technical reasoning is inconsistent; she provided contradictory statements regarding the difficulty of Python versus JavaScript, and she struggled to articulate a specific example of a technical "snag" or problem-solving experience when prompted.
+
+**Communication Quality:**
+Poor. The candidate appeared distracted and lacked the focus required for a professional interview. She failed to address the behavioral questions posed, instead speaking over the interviewer or ignoring the prompt entirely. Her responses were often disjointed and lacked clarity.
+
+**Final Recommendation:**
+Strong No Hire
+
+SCORE: 1 1
+interviewId 27ea2d62-aa23-4f27-86d0-17417d32099a

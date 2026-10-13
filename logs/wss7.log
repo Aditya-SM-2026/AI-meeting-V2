@@ -1,0 +1,10 @@
+WebSocket server running on port 8081
+Connected to Gemini socket, sending setup...
+WebSocket Client Disconnected
+[ws] Gemini socket closed. code=1000 reason=
+Connected to Gemini socket, sending setup...
+WebSocket Client Disconnected
+[ws] Gemini socket closed. code=1000 reason=
+Connected to Gemini socket, sending setup...
+[ws] Gemini socket closed. code=1000 reason=
+WebSocket Client Disconnected

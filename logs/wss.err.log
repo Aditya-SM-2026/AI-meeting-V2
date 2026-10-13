@@ -1,0 +1,12 @@
+46 |     }
+47 |   }
+48 |   let er;
+49 |   if (args.length > 0)
+50 |     er = args[0];
+51 |     throw er;
+                 ^
+error: Failed to start server. Is port 8081 in use?
+      at emitError (node:events:51:13)
+      at emitError (node:events:43:23)
+
+Bun v1.3.14 (Windows x64)

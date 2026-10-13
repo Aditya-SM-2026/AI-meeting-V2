@@ -1,0 +1,33 @@
+$ vite
+
+  [32m[1mVITE[22m v8.1.0[39m  [2mready in [0m[1m950[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m6:09:16 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m6:21:16 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Home.tsx, /src/index.css[22m
+[2m6:21:27 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Home.tsx, /src/index.css[22m
+[2m6:21:36 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Home.tsx, /src/index.css[22m
+[2m6:21:41 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Home.tsx, /src/index.css[22m
+[2m6:21:51 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Home.tsx, /src/index.css[22m
+[2m6:27:24 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/Pages/Interview.tsx[22m
+[2m6:28:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Report.tsx, /src/index.css[22m
+[2m6:28:47 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Report.tsx, /src/index.css[22m
+[2m6:28:51 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Report.tsx, /src/index.css[22m
+[2m6:29:08 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/Pages/Interview.tsx[22m
+[2m7:47:06 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/Pages/Interview.tsx[22m
+[2m7:47:09 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/Pages/Interview.tsx[22m
+[2m7:47:10 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/Pages/Interview.tsx[22m
+[2m7:47:24 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Interview.tsx, /src/index.css[22m
+[2m7:47:32 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Interview.tsx, /src/index.css[22m
+[2m7:47:50 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Interview.tsx, /src/index.css[22m
+[2m7:47:54 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Interview.tsx, /src/index.css[22m
+[2m7:47:55 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Interview.tsx, /src/index.css[22m
+[2m7:47:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Interview.tsx, /src/index.css[22m
+[2m7:48:10 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Home.tsx, /src/index.css[22m
+[2m7:48:11 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Home.tsx, /src/index.css[22m
+[2m7:48:23 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Home.tsx, /src/index.css[22m
+[2m7:49:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Report.tsx, /src/index.css[22m
+[2m7:50:19 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Report.tsx, /src/index.css[22m
+[2m7:50:44 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Report.tsx, /src/index.css[22m
+[2m7:51:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/Pages/Report.tsx, /src/index.css[22m

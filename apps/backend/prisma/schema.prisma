@@ -19,6 +19,30 @@ model Interview{
   score           Int?         @default(0)
   conversations   Message[]
   feedback        String?
+  videoScore      Int?
+  videoFeedback   Json?
+
+  candidateName   String
+  candidateEmail  String?
+  recruiterName   String?
+  resumeText      String?
+  jobDescription  String?
+  shareToken      String  @unique @default(uuid())
+  startedAt       DateTime?
+  completedAt     DateTime?
+  sessionMetrics  Json?
+  integrityReport Json?
+  aiProbability   Int?
+
+  plan             Json?
+  difficulty       String?
+  plannedDurationSec Int?
+  recordingData    String?
+  recordingStartedAt DateTime?
+  sessionEvents    Json?
+  humanDecision    Json?
+  report           Json?
+  reportModel      String?
 }
 
 model Message {
@@ -27,6 +51,7 @@ model Message {
   type            MessageType
   interviewId     String
   interview       Interview @relation(fields: [interviewId],references: [id])
+  createdAt       DateTime  @default(now())
 }
 
 enum MessageType{

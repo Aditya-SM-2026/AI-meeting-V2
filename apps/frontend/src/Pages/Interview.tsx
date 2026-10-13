@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import axios from "axios";
 import { useMicStream } from "../hooks/useMicStream";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
-import { useParams, useNavigate } from "react-router-dom";
+import { useVideoStream } from "../hooks/useVideoStream";
+
+const INTERVIEW_SECONDS = 5 * 60;
 
 // Injects the report's two type families once per app load.
 // Move this into index.html if you'd rather not do it at runtime.
@@ -32,18 +35,28 @@ const STATUS_COPY: Record<ConnectionStatus, { label: string; color: string }> = 
     error: { label: "Connection error", color: "#9C3B2E" },
 };
 
-export const Interview = () => {
+export const Interview = ({
+    interviewId,
+    onFinished,
+}: {
+    interviewId: string;
+    onFinished?: () => void;
+}) => {
     useReportFonts();
     const audioRef = useRef<HTMLAudioElement>(null);
     const wsRef = useRef<WebSocket | null>(null);
     const { playChunk, reset: resetPlayer } = useAudioPlayer();
-    const { interviewId } = useParams();
-    const navigate = useNavigate();
+
+    const finishedRef = useRef(onFinished);
+    useEffect(() => {
+        finishedRef.current = onFinished;
+    }, [onFinished]);
 
     const [status, setStatus] = useState<ConnectionStatus>("connecting");
     const [aiSpeaking, setAiSpeaking] = useState(false);
     const [transcript, setTranscript] = useState<TranscriptLine[]>([]);
     const [elapsed, setElapsed] = useState(0);
+    const remaining = Math.max(0, INTERVIEW_SECONDS - elapsed);
     const speakingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const transcriptEndRef = useRef<HTMLDivElement>(null);
 
@@ -70,6 +83,96 @@ export const Interview = () => {
     useEffect(() => {
         micRef.current = mic;
     }, [mic]);
+
+    const previewRef = useRef<HTMLVideoElement>(null);
+    const video = useVideoStream(previewRef);
+    const videoRef = useRef(video);
+    useEffect(() => {
+        videoRef.current = video;
+    }, [video]);
+
+    const videoUploadedRef = useRef(false);
+    const eventsRef = useRef<any[]>([]);
+    const hiddenAtRef = useRef<number | null>(null);
+    const blurredAtRef = useRef<number | null>(null);
+    const recordingStartedAtRef = useRef<string | null>(null);
+
+    useEffect(() => {
+        const onVisibility = () => {
+            if (document.hidden) {
+                hiddenAtRef.current = Date.now();
+                eventsRef.current.push({ type: "tab_hidden", at: new Date().toISOString() });
+            } else if (hiddenAtRef.current !== null) {
+                eventsRef.current.push({
+                    type: "tab_visible",
+                    at: new Date().toISOString(),
+                    durationSec: Math.round((Date.now() - hiddenAtRef.current) / 1000),
+                });
+                hiddenAtRef.current = null;
+            }
+        };
+        const onBlur = () => {
+            blurredAtRef.current = Date.now();
+            eventsRef.current.push({ type: "window_blur", at: new Date().toISOString() });
+        };
+        const onFocus = () => {
+            if (blurredAtRef.current !== null) {
+                blurredAtRef.current = null;
+            }
+        };
+        document.addEventListener("visibilitychange", onVisibility);
+        window.addEventListener("blur", onBlur);
+        window.addEventListener("focus", onFocus);
+        return () => {
+            document.removeEventListener("visibilitychange", onVisibility);
+            window.removeEventListener("blur", onBlur);
+            window.removeEventListener("focus", onFocus);
+        };
+    }, []);
+
+    const uploadVideoAnalysis = useCallback(async () => {
+        if (videoUploadedRef.current || !interviewId) return;
+        videoUploadedRef.current = true;
+        const frames = videoRef.current.getFrames();
+        if (frames.length === 0 && eventsRef.current.length === 0) return;
+        try {
+            await axios.post(
+                `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/v1/video-analysis`,
+                {
+                    interviewId,
+                    frames,
+                    events: eventsRef.current,
+                    recordingStartedAt: recordingStartedAtRef.current || undefined,
+                },
+                { timeout: 90000 }
+            );
+        } catch (err) {
+            console.error("Video analysis upload failed:", err);
+        }
+    }, [interviewId]);
+
+    const recordingUploadedRef = useRef(false);
+    const uploadRecording = useCallback(async () => {
+        if (recordingUploadedRef.current || !interviewId || !recordingStartedAtRef.current) return;
+        recordingUploadedRef.current = true;
+        try {
+            const blob = await videoRef.current.stopRecording();
+            if (!blob || blob.size === 0 || blob.size > 60 * 1024 * 1024) return;
+            const b64 = await new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result).split(",")[1] || "");
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+            await axios.post(
+                `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/v1/interviews/${interviewId}/recording`,
+                { recordingBase64: b64, recordingStartedAt: recordingStartedAtRef.current },
+                { timeout: 120000 }
+            );
+        } catch (err) {
+            console.error("Recording upload failed:", err);
+        }
+    }, [interviewId]);
 
     // Elapsed session timer.
     useEffect(() => {
@@ -120,6 +223,13 @@ export const Interview = () => {
                         micRef.current
                             .start()
                             .catch((err) => console.error("Error starting microphone", err));
+                        videoRef.current
+                            .start()
+                            .then(() => {
+                                recordingStartedAtRef.current = new Date().toISOString();
+                                videoRef.current.startRecording();
+                            })
+                            .catch((err) => console.error("Error starting camera", err));
                     } else if (msg.status === "error") {
                         setStatus("error");
                     } else if (msg.status === "disconnected") {
@@ -133,7 +243,12 @@ export const Interview = () => {
 
                 case "interviewComplete":
                     setStatus("ended");
-                    navigate(`/result/${msg.payload.candidateId}`);
+                    void (async () => {
+                        await uploadRecording();
+                        videoRef.current.stop();
+                        await uploadVideoAnalysis();
+                        finishedRef.current?.();
+                    })();
                     break;
 
                 case "interrupted":
@@ -152,13 +267,20 @@ export const Interview = () => {
 
         ws.onclose = (event) => {
             console.log("WebSocket Closed", event.code, event.reason);
+            eventsRef.current.push({ type: "disconnect", at: new Date().toISOString() });
             micRef.current.stop();
+            void (async () => {
+                await uploadRecording();
+                videoRef.current.stop();
+                await uploadVideoAnalysis();
+            })();
             wsRef.current = null;
             setStatus((s) => (s === "ended" ? s : "ended"));
         };
 
         return () => {
             micRef.current.stop();
+            videoRef.current.stop();
             resetPlayer();
             if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
                 ws.close();
@@ -167,10 +289,15 @@ export const Interview = () => {
     }, [interviewId]);
 
     const endInterview = () => {
-        micRef.current.stop();
-        resetPlayer();
-        wsRef.current?.close();
-        setStatus("ended");
+        void (async () => {
+            micRef.current.stop();
+            resetPlayer();
+            wsRef.current?.close();
+            await uploadRecording();
+            videoRef.current.stop();
+            await uploadVideoAnalysis();
+            finishedRef.current?.();
+        })();
     };
 
     const statusMeta = STATUS_COPY[status];
@@ -205,9 +332,13 @@ export const Interview = () => {
                 <div className="flex items-center gap-5">
                     <span
                         className="text-sm tabular-nums"
-                        style={{ fontFamily: "'IBM Plex Mono', monospace", color: "#63666F" }}
+                        style={{
+                            fontFamily: "'IBM Plex Mono', monospace",
+                            color: status === "live" && remaining <= 60 ? "#9C3B2E" : "#63666F",
+                            fontWeight: status === "live" && remaining <= 60 ? 500 : 400,
+                        }}
                     >
-                        {formatElapsed(elapsed)}
+                        {formatElapsed(remaining)}
                     </span>
                     <div className="flex items-center gap-2">
                         <span
@@ -246,6 +377,33 @@ export const Interview = () => {
                         active={aiSpeaking}
                         variant="bars"
                     />
+
+                    {video.active && (
+                        <div className="flex flex-col items-center gap-2">
+                            <video
+                                ref={previewRef}
+                                autoPlay
+                                playsInline
+                                muted
+                                className="rounded-lg"
+                                style={{
+                                    width: 180,
+                                    transform: "scaleX(-1)",
+                                    border: "1px solid #DAD5C7",
+                                    backgroundColor: "#1E2128",
+                                }}
+                            />
+                            <span
+                                className="text-[10px] uppercase tracking-widest"
+                                style={{
+                                    fontFamily: "'IBM Plex Mono', monospace",
+                                    color: "#63666F",
+                                }}
+                            >
+                                Camera — sampled for the video report
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 {/* Live transcript */}

@@ -1,0 +1,47 @@
+server is up
+Create interview error: 
+Invalid `prisma.interview.findFirst()` invocation in
+C:\Users\Aditya\AI-InterviewPlatform\apps\backend\src\routes\interviews.ts:40:55
+
+  37     }
+  38 }
+  39 
+→ 40 const existingSameJd = await prisma.interview.findFirst({
+       where: {
+         jobDescription: "Medhas Academy is hiring a Backend Engineer (AI team). Responsibilities: build and scale REST + WebSocket services powering our AI interview platform; design PostgreSQL schemas with Prisma; deploy containerized services. Must-have: Node.js or Bun, PostgreSQL, Docker, WebSockets, API design. Nice-to-have: Redis, Prisma, AWS. The engineer will integrate speech-to-speech AI models and meeting-platform SDKs."
+       },
+       orderBy: {
+         createdAt: "desc",
+         ~~~~~~~~~
+     ?   id?: SortOrder,
+     ?   githubMetadata?: SortOrder | SortOrderInput,
+     ?   status?: SortOrder | SortOrderInput,
+     ?   score?: SortOrder | SortOrderInput,
+     ?   feedback?: SortOrder | SortOrderInput,
+     ?   videoScore?: SortOrder | SortOrderInput,
+     ?   videoFeedback?: SortOrder | SortOrderInput,
+     ?   candidateName?: SortOrder,
+     ?   candidateEmail?: SortOrder | SortOrderInput,
+     ?   recruiterName?: SortOrder | SortOrderInput,
+     ?   resumeText?: SortOrder | SortOrderInput,
+     ?   jobDescription?: SortOrder | SortOrderInput,
+     ?   shareToken?: SortOrder,
+     ?   startedAt?: SortOrder | SortOrderInput,
+     ?   completedAt?: SortOrder | SortOrderInput,
+     ?   sessionMetrics?: SortOrder | SortOrderInput,
+     ?   integrityReport?: SortOrder | SortOrderInput,
+     ?   aiProbability?: SortOrder | SortOrderInput,
+     ?   plan?: SortOrder | SortOrderInput,
+     ?   difficulty?: SortOrder | SortOrderInput,
+     ?   plannedDurationSec?: SortOrder | SortOrderInput,
+     ?   recordingData?: SortOrder | SortOrderInput,
+     ?   recordingStartedAt?: SortOrder | SortOrderInput,
+     ?   sessionEvents?: SortOrder | SortOrderInput,
+     ?   humanDecision?: SortOrder | SortOrderInput,
+     ?   report?: SortOrder | SortOrderInput,
+     ?   reportModel?: SortOrder | SortOrderInput,
+     ?   conversations?: MessageOrderByRelationAggregateInput
+       }
+     })
+
+Unknown argument `createdAt`. Available options are marked with ?.

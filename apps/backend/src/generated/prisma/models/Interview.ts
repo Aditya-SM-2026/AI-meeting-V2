@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums.js"
-import type * as Prisma from "../internal/prismaNamespace.js"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model Interview
@@ -28,10 +28,16 @@ export type AggregateInterview = {
 
 export type InterviewAvgAggregateOutputType = {
   score: number | null
+  videoScore: number | null
+  aiProbability: number | null
+  plannedDurationSec: number | null
 }
 
 export type InterviewSumAggregateOutputType = {
   score: number | null
+  videoScore: number | null
+  aiProbability: number | null
+  plannedDurationSec: number | null
 }
 
 export type InterviewMinAggregateOutputType = {
@@ -39,6 +45,21 @@ export type InterviewMinAggregateOutputType = {
   status: $Enums.InterviewStatus | null
   score: number | null
   feedback: string | null
+  videoScore: number | null
+  candidateName: string | null
+  candidateEmail: string | null
+  recruiterName: string | null
+  resumeText: string | null
+  jobDescription: string | null
+  shareToken: string | null
+  startedAt: Date | null
+  completedAt: Date | null
+  aiProbability: number | null
+  difficulty: string | null
+  plannedDurationSec: number | null
+  recordingData: string | null
+  recordingStartedAt: Date | null
+  reportModel: string | null
 }
 
 export type InterviewMaxAggregateOutputType = {
@@ -46,6 +67,21 @@ export type InterviewMaxAggregateOutputType = {
   status: $Enums.InterviewStatus | null
   score: number | null
   feedback: string | null
+  videoScore: number | null
+  candidateName: string | null
+  candidateEmail: string | null
+  recruiterName: string | null
+  resumeText: string | null
+  jobDescription: string | null
+  shareToken: string | null
+  startedAt: Date | null
+  completedAt: Date | null
+  aiProbability: number | null
+  difficulty: string | null
+  plannedDurationSec: number | null
+  recordingData: string | null
+  recordingStartedAt: Date | null
+  reportModel: string | null
 }
 
 export type InterviewCountAggregateOutputType = {
@@ -54,16 +90,44 @@ export type InterviewCountAggregateOutputType = {
   status: number
   score: number
   feedback: number
+  videoScore: number
+  videoFeedback: number
+  candidateName: number
+  candidateEmail: number
+  recruiterName: number
+  resumeText: number
+  jobDescription: number
+  shareToken: number
+  startedAt: number
+  completedAt: number
+  sessionMetrics: number
+  integrityReport: number
+  aiProbability: number
+  plan: number
+  difficulty: number
+  plannedDurationSec: number
+  recordingData: number
+  recordingStartedAt: number
+  sessionEvents: number
+  humanDecision: number
+  report: number
+  reportModel: number
   _all: number
 }
 
 
 export type InterviewAvgAggregateInputType = {
   score?: true
+  videoScore?: true
+  aiProbability?: true
+  plannedDurationSec?: true
 }
 
 export type InterviewSumAggregateInputType = {
   score?: true
+  videoScore?: true
+  aiProbability?: true
+  plannedDurationSec?: true
 }
 
 export type InterviewMinAggregateInputType = {
@@ -71,6 +135,21 @@ export type InterviewMinAggregateInputType = {
   status?: true
   score?: true
   feedback?: true
+  videoScore?: true
+  candidateName?: true
+  candidateEmail?: true
+  recruiterName?: true
+  resumeText?: true
+  jobDescription?: true
+  shareToken?: true
+  startedAt?: true
+  completedAt?: true
+  aiProbability?: true
+  difficulty?: true
+  plannedDurationSec?: true
+  recordingData?: true
+  recordingStartedAt?: true
+  reportModel?: true
 }
 
 export type InterviewMaxAggregateInputType = {
@@ -78,6 +157,21 @@ export type InterviewMaxAggregateInputType = {
   status?: true
   score?: true
   feedback?: true
+  videoScore?: true
+  candidateName?: true
+  candidateEmail?: true
+  recruiterName?: true
+  resumeText?: true
+  jobDescription?: true
+  shareToken?: true
+  startedAt?: true
+  completedAt?: true
+  aiProbability?: true
+  difficulty?: true
+  plannedDurationSec?: true
+  recordingData?: true
+  recordingStartedAt?: true
+  reportModel?: true
 }
 
 export type InterviewCountAggregateInputType = {
@@ -86,6 +180,28 @@ export type InterviewCountAggregateInputType = {
   status?: true
   score?: true
   feedback?: true
+  videoScore?: true
+  videoFeedback?: true
+  candidateName?: true
+  candidateEmail?: true
+  recruiterName?: true
+  resumeText?: true
+  jobDescription?: true
+  shareToken?: true
+  startedAt?: true
+  completedAt?: true
+  sessionMetrics?: true
+  integrityReport?: true
+  aiProbability?: true
+  plan?: true
+  difficulty?: true
+  plannedDurationSec?: true
+  recordingData?: true
+  recordingStartedAt?: true
+  sessionEvents?: true
+  humanDecision?: true
+  report?: true
+  reportModel?: true
   _all?: true
 }
 
@@ -181,6 +297,28 @@ export type InterviewGroupByOutputType = {
   status: $Enums.InterviewStatus | null
   score: number | null
   feedback: string | null
+  videoScore: number | null
+  videoFeedback: runtime.JsonValue | null
+  candidateName: string
+  candidateEmail: string | null
+  recruiterName: string | null
+  resumeText: string | null
+  jobDescription: string | null
+  shareToken: string
+  startedAt: Date | null
+  completedAt: Date | null
+  sessionMetrics: runtime.JsonValue | null
+  integrityReport: runtime.JsonValue | null
+  aiProbability: number | null
+  plan: runtime.JsonValue | null
+  difficulty: string | null
+  plannedDurationSec: number | null
+  recordingData: string | null
+  recordingStartedAt: Date | null
+  sessionEvents: runtime.JsonValue | null
+  humanDecision: runtime.JsonValue | null
+  report: runtime.JsonValue | null
+  reportModel: string | null
   _count: InterviewCountAggregateOutputType | null
   _avg: InterviewAvgAggregateOutputType | null
   _sum: InterviewSumAggregateOutputType | null
@@ -212,6 +350,28 @@ export type InterviewWhereInput = {
   status?: Prisma.EnumInterviewStatusNullableFilter<"Interview"> | $Enums.InterviewStatus | null
   score?: Prisma.IntNullableFilter<"Interview"> | number | null
   feedback?: Prisma.StringNullableFilter<"Interview"> | string | null
+  videoScore?: Prisma.IntNullableFilter<"Interview"> | number | null
+  videoFeedback?: Prisma.JsonNullableFilter<"Interview">
+  candidateName?: Prisma.StringFilter<"Interview"> | string
+  candidateEmail?: Prisma.StringNullableFilter<"Interview"> | string | null
+  recruiterName?: Prisma.StringNullableFilter<"Interview"> | string | null
+  resumeText?: Prisma.StringNullableFilter<"Interview"> | string | null
+  jobDescription?: Prisma.StringNullableFilter<"Interview"> | string | null
+  shareToken?: Prisma.StringFilter<"Interview"> | string
+  startedAt?: Prisma.DateTimeNullableFilter<"Interview"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"Interview"> | Date | string | null
+  sessionMetrics?: Prisma.JsonNullableFilter<"Interview">
+  integrityReport?: Prisma.JsonNullableFilter<"Interview">
+  aiProbability?: Prisma.IntNullableFilter<"Interview"> | number | null
+  plan?: Prisma.JsonNullableFilter<"Interview">
+  difficulty?: Prisma.StringNullableFilter<"Interview"> | string | null
+  plannedDurationSec?: Prisma.IntNullableFilter<"Interview"> | number | null
+  recordingData?: Prisma.StringNullableFilter<"Interview"> | string | null
+  recordingStartedAt?: Prisma.DateTimeNullableFilter<"Interview"> | Date | string | null
+  sessionEvents?: Prisma.JsonNullableFilter<"Interview">
+  humanDecision?: Prisma.JsonNullableFilter<"Interview">
+  report?: Prisma.JsonNullableFilter<"Interview">
+  reportModel?: Prisma.StringNullableFilter<"Interview"> | string | null
   conversations?: Prisma.MessageListRelationFilter
 }
 
@@ -221,11 +381,34 @@ export type InterviewOrderByWithRelationInput = {
   status?: Prisma.SortOrderInput | Prisma.SortOrder
   score?: Prisma.SortOrderInput | Prisma.SortOrder
   feedback?: Prisma.SortOrderInput | Prisma.SortOrder
+  videoScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  videoFeedback?: Prisma.SortOrderInput | Prisma.SortOrder
+  candidateName?: Prisma.SortOrder
+  candidateEmail?: Prisma.SortOrderInput | Prisma.SortOrder
+  recruiterName?: Prisma.SortOrderInput | Prisma.SortOrder
+  resumeText?: Prisma.SortOrderInput | Prisma.SortOrder
+  jobDescription?: Prisma.SortOrderInput | Prisma.SortOrder
+  shareToken?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sessionMetrics?: Prisma.SortOrderInput | Prisma.SortOrder
+  integrityReport?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiProbability?: Prisma.SortOrderInput | Prisma.SortOrder
+  plan?: Prisma.SortOrderInput | Prisma.SortOrder
+  difficulty?: Prisma.SortOrderInput | Prisma.SortOrder
+  plannedDurationSec?: Prisma.SortOrderInput | Prisma.SortOrder
+  recordingData?: Prisma.SortOrderInput | Prisma.SortOrder
+  recordingStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sessionEvents?: Prisma.SortOrderInput | Prisma.SortOrder
+  humanDecision?: Prisma.SortOrderInput | Prisma.SortOrder
+  report?: Prisma.SortOrderInput | Prisma.SortOrder
+  reportModel?: Prisma.SortOrderInput | Prisma.SortOrder
   conversations?: Prisma.MessageOrderByRelationAggregateInput
 }
 
 export type InterviewWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  shareToken?: string
   AND?: Prisma.InterviewWhereInput | Prisma.InterviewWhereInput[]
   OR?: Prisma.InterviewWhereInput[]
   NOT?: Prisma.InterviewWhereInput | Prisma.InterviewWhereInput[]
@@ -233,8 +416,29 @@ export type InterviewWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumInterviewStatusNullableFilter<"Interview"> | $Enums.InterviewStatus | null
   score?: Prisma.IntNullableFilter<"Interview"> | number | null
   feedback?: Prisma.StringNullableFilter<"Interview"> | string | null
+  videoScore?: Prisma.IntNullableFilter<"Interview"> | number | null
+  videoFeedback?: Prisma.JsonNullableFilter<"Interview">
+  candidateName?: Prisma.StringFilter<"Interview"> | string
+  candidateEmail?: Prisma.StringNullableFilter<"Interview"> | string | null
+  recruiterName?: Prisma.StringNullableFilter<"Interview"> | string | null
+  resumeText?: Prisma.StringNullableFilter<"Interview"> | string | null
+  jobDescription?: Prisma.StringNullableFilter<"Interview"> | string | null
+  startedAt?: Prisma.DateTimeNullableFilter<"Interview"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"Interview"> | Date | string | null
+  sessionMetrics?: Prisma.JsonNullableFilter<"Interview">
+  integrityReport?: Prisma.JsonNullableFilter<"Interview">
+  aiProbability?: Prisma.IntNullableFilter<"Interview"> | number | null
+  plan?: Prisma.JsonNullableFilter<"Interview">
+  difficulty?: Prisma.StringNullableFilter<"Interview"> | string | null
+  plannedDurationSec?: Prisma.IntNullableFilter<"Interview"> | number | null
+  recordingData?: Prisma.StringNullableFilter<"Interview"> | string | null
+  recordingStartedAt?: Prisma.DateTimeNullableFilter<"Interview"> | Date | string | null
+  sessionEvents?: Prisma.JsonNullableFilter<"Interview">
+  humanDecision?: Prisma.JsonNullableFilter<"Interview">
+  report?: Prisma.JsonNullableFilter<"Interview">
+  reportModel?: Prisma.StringNullableFilter<"Interview"> | string | null
   conversations?: Prisma.MessageListRelationFilter
-}, "id">
+}, "id" | "shareToken">
 
 export type InterviewOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -242,6 +446,28 @@ export type InterviewOrderByWithAggregationInput = {
   status?: Prisma.SortOrderInput | Prisma.SortOrder
   score?: Prisma.SortOrderInput | Prisma.SortOrder
   feedback?: Prisma.SortOrderInput | Prisma.SortOrder
+  videoScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  videoFeedback?: Prisma.SortOrderInput | Prisma.SortOrder
+  candidateName?: Prisma.SortOrder
+  candidateEmail?: Prisma.SortOrderInput | Prisma.SortOrder
+  recruiterName?: Prisma.SortOrderInput | Prisma.SortOrder
+  resumeText?: Prisma.SortOrderInput | Prisma.SortOrder
+  jobDescription?: Prisma.SortOrderInput | Prisma.SortOrder
+  shareToken?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sessionMetrics?: Prisma.SortOrderInput | Prisma.SortOrder
+  integrityReport?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiProbability?: Prisma.SortOrderInput | Prisma.SortOrder
+  plan?: Prisma.SortOrderInput | Prisma.SortOrder
+  difficulty?: Prisma.SortOrderInput | Prisma.SortOrder
+  plannedDurationSec?: Prisma.SortOrderInput | Prisma.SortOrder
+  recordingData?: Prisma.SortOrderInput | Prisma.SortOrder
+  recordingStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sessionEvents?: Prisma.SortOrderInput | Prisma.SortOrder
+  humanDecision?: Prisma.SortOrderInput | Prisma.SortOrder
+  report?: Prisma.SortOrderInput | Prisma.SortOrder
+  reportModel?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.InterviewCountOrderByAggregateInput
   _avg?: Prisma.InterviewAvgOrderByAggregateInput
   _max?: Prisma.InterviewMaxOrderByAggregateInput
@@ -258,6 +484,28 @@ export type InterviewScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumInterviewStatusNullableWithAggregatesFilter<"Interview"> | $Enums.InterviewStatus | null
   score?: Prisma.IntNullableWithAggregatesFilter<"Interview"> | number | null
   feedback?: Prisma.StringNullableWithAggregatesFilter<"Interview"> | string | null
+  videoScore?: Prisma.IntNullableWithAggregatesFilter<"Interview"> | number | null
+  videoFeedback?: Prisma.JsonNullableWithAggregatesFilter<"Interview">
+  candidateName?: Prisma.StringWithAggregatesFilter<"Interview"> | string
+  candidateEmail?: Prisma.StringNullableWithAggregatesFilter<"Interview"> | string | null
+  recruiterName?: Prisma.StringNullableWithAggregatesFilter<"Interview"> | string | null
+  resumeText?: Prisma.StringNullableWithAggregatesFilter<"Interview"> | string | null
+  jobDescription?: Prisma.StringNullableWithAggregatesFilter<"Interview"> | string | null
+  shareToken?: Prisma.StringWithAggregatesFilter<"Interview"> | string
+  startedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Interview"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Interview"> | Date | string | null
+  sessionMetrics?: Prisma.JsonNullableWithAggregatesFilter<"Interview">
+  integrityReport?: Prisma.JsonNullableWithAggregatesFilter<"Interview">
+  aiProbability?: Prisma.IntNullableWithAggregatesFilter<"Interview"> | number | null
+  plan?: Prisma.JsonNullableWithAggregatesFilter<"Interview">
+  difficulty?: Prisma.StringNullableWithAggregatesFilter<"Interview"> | string | null
+  plannedDurationSec?: Prisma.IntNullableWithAggregatesFilter<"Interview"> | number | null
+  recordingData?: Prisma.StringNullableWithAggregatesFilter<"Interview"> | string | null
+  recordingStartedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Interview"> | Date | string | null
+  sessionEvents?: Prisma.JsonNullableWithAggregatesFilter<"Interview">
+  humanDecision?: Prisma.JsonNullableWithAggregatesFilter<"Interview">
+  report?: Prisma.JsonNullableWithAggregatesFilter<"Interview">
+  reportModel?: Prisma.StringNullableWithAggregatesFilter<"Interview"> | string | null
 }
 
 export type InterviewCreateInput = {
@@ -266,6 +514,28 @@ export type InterviewCreateInput = {
   status?: $Enums.InterviewStatus | null
   score?: number | null
   feedback?: string | null
+  videoScore?: number | null
+  videoFeedback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  candidateName: string
+  candidateEmail?: string | null
+  recruiterName?: string | null
+  resumeText?: string | null
+  jobDescription?: string | null
+  shareToken?: string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  sessionMetrics?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  integrityReport?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiProbability?: number | null
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  difficulty?: string | null
+  plannedDurationSec?: number | null
+  recordingData?: string | null
+  recordingStartedAt?: Date | string | null
+  sessionEvents?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reportModel?: string | null
   conversations?: Prisma.MessageCreateNestedManyWithoutInterviewInput
 }
 
@@ -275,6 +545,28 @@ export type InterviewUncheckedCreateInput = {
   status?: $Enums.InterviewStatus | null
   score?: number | null
   feedback?: string | null
+  videoScore?: number | null
+  videoFeedback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  candidateName: string
+  candidateEmail?: string | null
+  recruiterName?: string | null
+  resumeText?: string | null
+  jobDescription?: string | null
+  shareToken?: string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  sessionMetrics?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  integrityReport?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiProbability?: number | null
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  difficulty?: string | null
+  plannedDurationSec?: number | null
+  recordingData?: string | null
+  recordingStartedAt?: Date | string | null
+  sessionEvents?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reportModel?: string | null
   conversations?: Prisma.MessageUncheckedCreateNestedManyWithoutInterviewInput
 }
 
@@ -284,6 +576,28 @@ export type InterviewUpdateInput = {
   status?: Prisma.NullableEnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus | null
   score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  videoFeedback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  candidateName?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruiterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resumeText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.StringFieldUpdateOperationsInput | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionMetrics?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  integrityReport?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiProbability?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  difficulty?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plannedDurationSec?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recordingData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recordingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionEvents?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reportModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversations?: Prisma.MessageUpdateManyWithoutInterviewNestedInput
 }
 
@@ -293,6 +607,28 @@ export type InterviewUncheckedUpdateInput = {
   status?: Prisma.NullableEnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus | null
   score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  videoFeedback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  candidateName?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruiterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resumeText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.StringFieldUpdateOperationsInput | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionMetrics?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  integrityReport?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiProbability?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  difficulty?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plannedDurationSec?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recordingData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recordingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionEvents?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reportModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversations?: Prisma.MessageUncheckedUpdateManyWithoutInterviewNestedInput
 }
 
@@ -302,6 +638,28 @@ export type InterviewCreateManyInput = {
   status?: $Enums.InterviewStatus | null
   score?: number | null
   feedback?: string | null
+  videoScore?: number | null
+  videoFeedback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  candidateName: string
+  candidateEmail?: string | null
+  recruiterName?: string | null
+  resumeText?: string | null
+  jobDescription?: string | null
+  shareToken?: string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  sessionMetrics?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  integrityReport?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiProbability?: number | null
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  difficulty?: string | null
+  plannedDurationSec?: number | null
+  recordingData?: string | null
+  recordingStartedAt?: Date | string | null
+  sessionEvents?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reportModel?: string | null
 }
 
 export type InterviewUpdateManyMutationInput = {
@@ -310,6 +668,28 @@ export type InterviewUpdateManyMutationInput = {
   status?: Prisma.NullableEnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus | null
   score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  videoFeedback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  candidateName?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruiterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resumeText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.StringFieldUpdateOperationsInput | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionMetrics?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  integrityReport?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiProbability?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  difficulty?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plannedDurationSec?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recordingData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recordingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionEvents?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reportModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InterviewUncheckedUpdateManyInput = {
@@ -318,6 +698,28 @@ export type InterviewUncheckedUpdateManyInput = {
   status?: Prisma.NullableEnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus | null
   score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  videoFeedback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  candidateName?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruiterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resumeText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.StringFieldUpdateOperationsInput | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionMetrics?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  integrityReport?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiProbability?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  difficulty?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plannedDurationSec?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recordingData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recordingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionEvents?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reportModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InterviewCountOrderByAggregateInput = {
@@ -326,10 +728,35 @@ export type InterviewCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   score?: Prisma.SortOrder
   feedback?: Prisma.SortOrder
+  videoScore?: Prisma.SortOrder
+  videoFeedback?: Prisma.SortOrder
+  candidateName?: Prisma.SortOrder
+  candidateEmail?: Prisma.SortOrder
+  recruiterName?: Prisma.SortOrder
+  resumeText?: Prisma.SortOrder
+  jobDescription?: Prisma.SortOrder
+  shareToken?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
+  sessionMetrics?: Prisma.SortOrder
+  integrityReport?: Prisma.SortOrder
+  aiProbability?: Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  difficulty?: Prisma.SortOrder
+  plannedDurationSec?: Prisma.SortOrder
+  recordingData?: Prisma.SortOrder
+  recordingStartedAt?: Prisma.SortOrder
+  sessionEvents?: Prisma.SortOrder
+  humanDecision?: Prisma.SortOrder
+  report?: Prisma.SortOrder
+  reportModel?: Prisma.SortOrder
 }
 
 export type InterviewAvgOrderByAggregateInput = {
   score?: Prisma.SortOrder
+  videoScore?: Prisma.SortOrder
+  aiProbability?: Prisma.SortOrder
+  plannedDurationSec?: Prisma.SortOrder
 }
 
 export type InterviewMaxOrderByAggregateInput = {
@@ -337,6 +764,21 @@ export type InterviewMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   score?: Prisma.SortOrder
   feedback?: Prisma.SortOrder
+  videoScore?: Prisma.SortOrder
+  candidateName?: Prisma.SortOrder
+  candidateEmail?: Prisma.SortOrder
+  recruiterName?: Prisma.SortOrder
+  resumeText?: Prisma.SortOrder
+  jobDescription?: Prisma.SortOrder
+  shareToken?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
+  aiProbability?: Prisma.SortOrder
+  difficulty?: Prisma.SortOrder
+  plannedDurationSec?: Prisma.SortOrder
+  recordingData?: Prisma.SortOrder
+  recordingStartedAt?: Prisma.SortOrder
+  reportModel?: Prisma.SortOrder
 }
 
 export type InterviewMinOrderByAggregateInput = {
@@ -344,10 +786,28 @@ export type InterviewMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   score?: Prisma.SortOrder
   feedback?: Prisma.SortOrder
+  videoScore?: Prisma.SortOrder
+  candidateName?: Prisma.SortOrder
+  candidateEmail?: Prisma.SortOrder
+  recruiterName?: Prisma.SortOrder
+  resumeText?: Prisma.SortOrder
+  jobDescription?: Prisma.SortOrder
+  shareToken?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
+  aiProbability?: Prisma.SortOrder
+  difficulty?: Prisma.SortOrder
+  plannedDurationSec?: Prisma.SortOrder
+  recordingData?: Prisma.SortOrder
+  recordingStartedAt?: Prisma.SortOrder
+  reportModel?: Prisma.SortOrder
 }
 
 export type InterviewSumOrderByAggregateInput = {
   score?: Prisma.SortOrder
+  videoScore?: Prisma.SortOrder
+  aiProbability?: Prisma.SortOrder
+  plannedDurationSec?: Prisma.SortOrder
 }
 
 export type InterviewScalarRelationFilter = {
@@ -375,6 +835,10 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type InterviewCreateNestedOneWithoutConversationsInput = {
   create?: Prisma.XOR<Prisma.InterviewCreateWithoutConversationsInput, Prisma.InterviewUncheckedCreateWithoutConversationsInput>
   connectOrCreate?: Prisma.InterviewCreateOrConnectWithoutConversationsInput
@@ -395,6 +859,28 @@ export type InterviewCreateWithoutConversationsInput = {
   status?: $Enums.InterviewStatus | null
   score?: number | null
   feedback?: string | null
+  videoScore?: number | null
+  videoFeedback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  candidateName: string
+  candidateEmail?: string | null
+  recruiterName?: string | null
+  resumeText?: string | null
+  jobDescription?: string | null
+  shareToken?: string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  sessionMetrics?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  integrityReport?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiProbability?: number | null
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  difficulty?: string | null
+  plannedDurationSec?: number | null
+  recordingData?: string | null
+  recordingStartedAt?: Date | string | null
+  sessionEvents?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reportModel?: string | null
 }
 
 export type InterviewUncheckedCreateWithoutConversationsInput = {
@@ -403,6 +889,28 @@ export type InterviewUncheckedCreateWithoutConversationsInput = {
   status?: $Enums.InterviewStatus | null
   score?: number | null
   feedback?: string | null
+  videoScore?: number | null
+  videoFeedback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  candidateName: string
+  candidateEmail?: string | null
+  recruiterName?: string | null
+  resumeText?: string | null
+  jobDescription?: string | null
+  shareToken?: string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  sessionMetrics?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  integrityReport?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiProbability?: number | null
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  difficulty?: string | null
+  plannedDurationSec?: number | null
+  recordingData?: string | null
+  recordingStartedAt?: Date | string | null
+  sessionEvents?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reportModel?: string | null
 }
 
 export type InterviewCreateOrConnectWithoutConversationsInput = {
@@ -427,6 +935,28 @@ export type InterviewUpdateWithoutConversationsInput = {
   status?: Prisma.NullableEnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus | null
   score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  videoFeedback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  candidateName?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruiterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resumeText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.StringFieldUpdateOperationsInput | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionMetrics?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  integrityReport?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiProbability?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  difficulty?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plannedDurationSec?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recordingData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recordingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionEvents?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reportModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InterviewUncheckedUpdateWithoutConversationsInput = {
@@ -435,6 +965,28 @@ export type InterviewUncheckedUpdateWithoutConversationsInput = {
   status?: Prisma.NullableEnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus | null
   score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  videoFeedback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  candidateName?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruiterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resumeText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareToken?: Prisma.StringFieldUpdateOperationsInput | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionMetrics?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  integrityReport?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiProbability?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  difficulty?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plannedDurationSec?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recordingData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recordingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionEvents?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  humanDecision?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  report?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reportModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -474,6 +1026,28 @@ export type InterviewSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   status?: boolean
   score?: boolean
   feedback?: boolean
+  videoScore?: boolean
+  videoFeedback?: boolean
+  candidateName?: boolean
+  candidateEmail?: boolean
+  recruiterName?: boolean
+  resumeText?: boolean
+  jobDescription?: boolean
+  shareToken?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
+  sessionMetrics?: boolean
+  integrityReport?: boolean
+  aiProbability?: boolean
+  plan?: boolean
+  difficulty?: boolean
+  plannedDurationSec?: boolean
+  recordingData?: boolean
+  recordingStartedAt?: boolean
+  sessionEvents?: boolean
+  humanDecision?: boolean
+  report?: boolean
+  reportModel?: boolean
   conversations?: boolean | Prisma.Interview$conversationsArgs<ExtArgs>
   _count?: boolean | Prisma.InterviewCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["interview"]>
@@ -484,6 +1058,28 @@ export type InterviewSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   status?: boolean
   score?: boolean
   feedback?: boolean
+  videoScore?: boolean
+  videoFeedback?: boolean
+  candidateName?: boolean
+  candidateEmail?: boolean
+  recruiterName?: boolean
+  resumeText?: boolean
+  jobDescription?: boolean
+  shareToken?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
+  sessionMetrics?: boolean
+  integrityReport?: boolean
+  aiProbability?: boolean
+  plan?: boolean
+  difficulty?: boolean
+  plannedDurationSec?: boolean
+  recordingData?: boolean
+  recordingStartedAt?: boolean
+  sessionEvents?: boolean
+  humanDecision?: boolean
+  report?: boolean
+  reportModel?: boolean
 }, ExtArgs["result"]["interview"]>
 
 export type InterviewSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -492,6 +1088,28 @@ export type InterviewSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   status?: boolean
   score?: boolean
   feedback?: boolean
+  videoScore?: boolean
+  videoFeedback?: boolean
+  candidateName?: boolean
+  candidateEmail?: boolean
+  recruiterName?: boolean
+  resumeText?: boolean
+  jobDescription?: boolean
+  shareToken?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
+  sessionMetrics?: boolean
+  integrityReport?: boolean
+  aiProbability?: boolean
+  plan?: boolean
+  difficulty?: boolean
+  plannedDurationSec?: boolean
+  recordingData?: boolean
+  recordingStartedAt?: boolean
+  sessionEvents?: boolean
+  humanDecision?: boolean
+  report?: boolean
+  reportModel?: boolean
 }, ExtArgs["result"]["interview"]>
 
 export type InterviewSelectScalar = {
@@ -500,9 +1118,31 @@ export type InterviewSelectScalar = {
   status?: boolean
   score?: boolean
   feedback?: boolean
+  videoScore?: boolean
+  videoFeedback?: boolean
+  candidateName?: boolean
+  candidateEmail?: boolean
+  recruiterName?: boolean
+  resumeText?: boolean
+  jobDescription?: boolean
+  shareToken?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
+  sessionMetrics?: boolean
+  integrityReport?: boolean
+  aiProbability?: boolean
+  plan?: boolean
+  difficulty?: boolean
+  plannedDurationSec?: boolean
+  recordingData?: boolean
+  recordingStartedAt?: boolean
+  sessionEvents?: boolean
+  humanDecision?: boolean
+  report?: boolean
+  reportModel?: boolean
 }
 
-export type InterviewOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "githubMetadata" | "status" | "score" | "feedback", ExtArgs["result"]["interview"]>
+export type InterviewOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "githubMetadata" | "status" | "score" | "feedback" | "videoScore" | "videoFeedback" | "candidateName" | "candidateEmail" | "recruiterName" | "resumeText" | "jobDescription" | "shareToken" | "startedAt" | "completedAt" | "sessionMetrics" | "integrityReport" | "aiProbability" | "plan" | "difficulty" | "plannedDurationSec" | "recordingData" | "recordingStartedAt" | "sessionEvents" | "humanDecision" | "report" | "reportModel", ExtArgs["result"]["interview"]>
 export type InterviewInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversations?: boolean | Prisma.Interview$conversationsArgs<ExtArgs>
   _count?: boolean | Prisma.InterviewCountOutputTypeDefaultArgs<ExtArgs>
@@ -521,6 +1161,28 @@ export type $InterviewPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     status: $Enums.InterviewStatus | null
     score: number | null
     feedback: string | null
+    videoScore: number | null
+    videoFeedback: runtime.JsonValue | null
+    candidateName: string
+    candidateEmail: string | null
+    recruiterName: string | null
+    resumeText: string | null
+    jobDescription: string | null
+    shareToken: string
+    startedAt: Date | null
+    completedAt: Date | null
+    sessionMetrics: runtime.JsonValue | null
+    integrityReport: runtime.JsonValue | null
+    aiProbability: number | null
+    plan: runtime.JsonValue | null
+    difficulty: string | null
+    plannedDurationSec: number | null
+    recordingData: string | null
+    recordingStartedAt: Date | null
+    sessionEvents: runtime.JsonValue | null
+    humanDecision: runtime.JsonValue | null
+    report: runtime.JsonValue | null
+    reportModel: string | null
   }, ExtArgs["result"]["interview"]>
   composites: {}
 }
@@ -950,6 +1612,28 @@ export interface InterviewFieldRefs {
   readonly status: Prisma.FieldRef<"Interview", 'InterviewStatus'>
   readonly score: Prisma.FieldRef<"Interview", 'Int'>
   readonly feedback: Prisma.FieldRef<"Interview", 'String'>
+  readonly videoScore: Prisma.FieldRef<"Interview", 'Int'>
+  readonly videoFeedback: Prisma.FieldRef<"Interview", 'Json'>
+  readonly candidateName: Prisma.FieldRef<"Interview", 'String'>
+  readonly candidateEmail: Prisma.FieldRef<"Interview", 'String'>
+  readonly recruiterName: Prisma.FieldRef<"Interview", 'String'>
+  readonly resumeText: Prisma.FieldRef<"Interview", 'String'>
+  readonly jobDescription: Prisma.FieldRef<"Interview", 'String'>
+  readonly shareToken: Prisma.FieldRef<"Interview", 'String'>
+  readonly startedAt: Prisma.FieldRef<"Interview", 'DateTime'>
+  readonly completedAt: Prisma.FieldRef<"Interview", 'DateTime'>
+  readonly sessionMetrics: Prisma.FieldRef<"Interview", 'Json'>
+  readonly integrityReport: Prisma.FieldRef<"Interview", 'Json'>
+  readonly aiProbability: Prisma.FieldRef<"Interview", 'Int'>
+  readonly plan: Prisma.FieldRef<"Interview", 'Json'>
+  readonly difficulty: Prisma.FieldRef<"Interview", 'String'>
+  readonly plannedDurationSec: Prisma.FieldRef<"Interview", 'Int'>
+  readonly recordingData: Prisma.FieldRef<"Interview", 'String'>
+  readonly recordingStartedAt: Prisma.FieldRef<"Interview", 'DateTime'>
+  readonly sessionEvents: Prisma.FieldRef<"Interview", 'Json'>
+  readonly humanDecision: Prisma.FieldRef<"Interview", 'Json'>
+  readonly report: Prisma.FieldRef<"Interview", 'Json'>
+  readonly reportModel: Prisma.FieldRef<"Interview", 'String'>
 }
     
 
@@ -1173,7 +1857,7 @@ export type InterviewCreateArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * The data needed to create a Interview.
    */
-  data?: Prisma.XOR<Prisma.InterviewCreateInput, Prisma.InterviewUncheckedCreateInput>
+  data: Prisma.XOR<Prisma.InterviewCreateInput, Prisma.InterviewUncheckedCreateInput>
 }
 
 /**

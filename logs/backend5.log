@@ -1,0 +1,23 @@
+server is up
+PayloadTooLargeError: request entity too large
+    at readStream (C:\Users\Aditya\AI-InterviewPlatform\node_modules\raw-body\index.js:163:17)
+    at read (C:\Users\Aditya\AI-InterviewPlatform\node_modules\body-parser\lib\read.js:113:3)
+    at jsonParser (C:\Users\Aditya\AI-InterviewPlatform\node_modules\body-parser\lib\types\json.js:60:5)
+    at handleRequest (C:\Users\Aditya\AI-InterviewPlatform\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\Aditya\AI-InterviewPlatform\node_modules\router\index.js:342:13)
+    at <anonymous> (C:\Users\Aditya\AI-InterviewPlatform\node_modules\router\index.js:297:9)
+    at next (C:\Users\Aditya\AI-InterviewPlatform\node_modules\router\index.js:291:5)
+    at handle (C:\Users\Aditya\AI-InterviewPlatform\node_modules\router\index.js:186:3)
+    at handle (C:\Users\Aditya\AI-InterviewPlatform\node_modules\express\lib\application.js:177:15)
+    at app (C:\Users\Aditya\AI-InterviewPlatform\node_modules\express\lib\express.js:38:9)
+    at emit (node:events:98:22)
+    at onNodeHTTPRequest (node:_http_server:373:22)
+interviewId 1cc00675-7136-4d08-8543-9a592823c3fb
+**Hiring-Panel Summary**
+
+*   **Strengths:** Priya demonstrates strong technical proficiency with Node.js and Prisma, clearly understanding performance bottlenecks like N+1 queries. She provided a concise, effective solution involving eager loading and Redis caching. She also showed practical awareness of database integrity constraints (unique constraints) and system architecture.
+*   **Weaknesses:** Responses were brief and sometimes lacked depth; for instance, the explanation of the attendance system challenges was somewhat superficial, focusing only on basic constraints rather than potential concurrency or edge-case handling.
+*   **Communication Quality:** Clear, direct, and concise. She communicates technical concepts effectively but tends to be very brief, leaving little room for detailed architectural discussion.
+*   **Final Recommendation:** Hire. Priya shows the necessary technical intuition for a backend developer role and communicates clearly under time pressure.
+
+SCORE: 7 7
